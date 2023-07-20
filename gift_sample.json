@@ -1,0 +1,72 @@
+[
+    {
+        "id": 1,
+        "nom": "Chocolates",
+        "prix": 10.99,
+        "image": "https://example.com/chocolates.jpg",
+        "isAvailable": 1
+    },
+    {
+        "id": 2,
+        "nom": "Flower Bouquet",
+        "prix": 19.99,
+        "image": "https://example.com/flower-bouquet.jpg",
+        "isAvailable": 1
+    },
+    {
+        "id": 3,
+        "nom": "Perfume",
+        "prix": 55.99,
+        "image": "https://example.com/perfume.jpg",
+        "isAvailable": 1
+    },
+    {
+        "id": 4,
+        "nom": "Teddy Bear",
+        "prix": 29.99,
+        "image": "https://example.com/teddy-bear.jpg",
+        "isAvailable": 1
+    },
+    {
+        "id": 5,
+        "nom": "Watch",
+        "prix": 99.99,
+        "image": "https://example.com/watch.jpg",
+        "isAvailable": 1
+    },
+    {
+        "id": 6,
+        "nom": "Book",
+        "prix": 14.99,
+        "image": "https://example.com/book.jpg",
+        "isAvailable": 1
+    },
+    {
+        "id": 7,
+        "nom": "Candle Set",
+        "prix": 24.99,
+        "image": "https://example.com/candle-set.jpg",
+        "isAvailable": 1
+    },
+    {
+        "id": 8,
+        "nom": "Scented Soap Set",
+        "prix": 12.99,
+        "image": "https://example.com/scented-soap-set.jpg",
+        "isAvailable": 1
+    },
+    {
+        "id": 9,
+        "nom": "Sunglasses",
+        "prix": 79.99,
+        "image": "https://example.com/sunglasses.jpg",
+        "isAvailable": 1
+    },
+    {
+        "id": 10,
+        "nom": "Coffee Mug",
+        "prix": 9.99,
+        "image": "https://example.com/coffee-mug.jpg",
+        "isAvailable": 1
+    }
+]

@@ -1,0 +1,352 @@
+[
+    {
+        "id": 1,
+        "contenu": "Hey, how are you?",
+        "typeMessage": "text",
+        "sender": 9,
+        "dateMessage": "2023-07-01T10:00:00.000Z",
+        "status": "read",
+        "giftId": 1,
+        "chatId": 1
+    },
+    {
+        "id": 2,
+        "contenu": "Hi there! I'm good, thank you. How about you?",
+        "typeMessage": "text",
+        "sender": 10,
+        "dateMessage": "2023-07-01T11:30:00.000Z",
+        "status": "read",
+        "giftId": 2,
+        "chatId": 1
+    },
+    {
+        "id": 3,
+        "contenu": "I'm doing well too. It's a nice day today!",
+        "typeMessage": "text",
+        "sender": 9,
+        "dateMessage": "2023-07-01T12:15:00.000Z",
+        "status": "read",
+        "giftId": 3,
+        "chatId": 1
+    },
+    {
+        "id": 4,
+        "contenu": "Yes, the weather is perfect!",
+        "typeMessage": "text",
+        "sender": 10,
+        "dateMessage": "2023-07-01T12:45:00.000Z",
+        "status": "read",
+        "giftId": 4,
+        "chatId": 1
+    },
+    {
+        "id": 5,
+        "contenu": "By the way, have you watched the latest movie?",
+        "typeMessage": "text",
+        "sender": 9,
+        "dateMessage": "2023-07-01T14:20:00.000Z",
+        "status": "read",
+        "giftId": 5,
+        "chatId": 1
+    },
+    {
+        "id": 6,
+        "contenu": "Not yet, but I plan to watch it this weekend!",
+        "typeMessage": "text",
+        "sender": 10,
+        "dateMessage": "2023-07-01T15:10:00.000Z",
+        "status": "read",
+        "giftId": 6,
+        "chatId": 1
+    },
+    {
+        "id": 7,
+        "contenu": "Great! Let me know how you find it.",
+        "typeMessage": "text",
+        "sender": 9,
+        "dateMessage": "2023-07-01T15:45:00.000Z",
+        "status": "read",
+        "giftId": 7,
+        "chatId": 1
+    },
+    {
+        "id": 8,
+        "contenu": "Sure, I'll give you a review afterward.",
+        "typeMessage": "text",
+        "sender": 10,
+        "dateMessage": "2023-07-01T16:30:00.000Z",
+        "status": "read",
+        "giftId": 8,
+        "chatId": 1
+    },
+    {
+        "id": 9,
+        "contenu": "Hey, how was your day?",
+        "typeMessage": "text",
+        "sender": 9,
+        "dateMessage": "2023-07-01T17:00:00.000Z",
+        "status": "read",
+        "giftId": 9,
+        "chatId": 1
+    },
+    {
+        "id": 10,
+        "contenu": "It was productive. I managed to finish some pending tasks.",
+        "typeMessage": "text",
+        "sender": 10,
+        "dateMessage": "2023-07-01T17:45:00.000Z",
+        "status": "read",
+        "giftId": 10,
+        "chatId": 1
+    },
+    {
+        "id": 11,
+        "contenu": "That's great! Keep up the good work.",
+        "typeMessage": "text",
+        "sender": 9,
+        "dateMessage": "2023-07-01T18:30:00.000Z",
+        "status": "read",
+        "giftId": 11,
+        "chatId": 1
+    },
+    {
+        "id": 12,
+        "contenu": "Thank you! How about you? How was your day?",
+        "typeMessage": "text",
+        "sender": 10,
+        "dateMessage": "2023-07-01T19:00:00.000Z",
+        "status": "read",
+        "giftId": 12,
+        "chatId": 1
+    },
+    {
+        "id": 13,
+        "contenu": "That's awesome! Let's catch up soon.",
+        "typeMessage": "text",
+        "sender": 10,
+        "dateMessage": "2023-07-01T20:00:00.000Z",
+        "status": "read",
+        "giftId": 14,
+        "chatId": 1
+    },
+    {
+        "id": 14,
+        "contenu": "Definitely! Looking forward to it.",
+        "typeMessage": "text",
+        "sender": 9,
+        "dateMessage": "2023-07-01T20:30:00.000Z",
+        "status": "read",
+        "giftId": 15,
+        "chatId": 1
+    },
+    {
+        "id": 15,
+        "contenu": "Hey, how's it going?",
+        "typeMessage": "text",
+        "sender": 9,
+        "dateMessage": "2023-07-01T10:00:00.000Z",
+        "status": "read",
+        "giftId": 16,
+        "chatId": 2
+    },
+    {
+        "id": 16,
+        "contenu": "Hey! I'm doing well, thanks. Just relaxing at home.",
+        "typeMessage": "text",
+        "sender": 11,
+        "dateMessage": "2023-07-01T11:30:00.000Z",
+        "status": "read",
+        "giftId": 17,
+        "chatId": 2
+    },
+    {
+        "id": 17,
+        "contenu": "That sounds nice. It's always good to take a break.",
+        "typeMessage": "text",
+        "sender": 9,
+        "dateMessage": "2023-07-01T12:15:00.000Z",
+        "status": "read",
+        "giftId": 18,
+        "chatId": 2
+    },
+    {
+        "id": 18,
+        "contenu": "Absolutely! How about you? How's your day been?",
+        "typeMessage": "text",
+        "sender": 11,
+        "dateMessage": "2023-07-01T12:45:00.000Z",
+        "status": "read",
+        "giftId": 19,
+        "chatId": 2
+    },
+    {
+        "id": 19,
+        "contenu": "It's been busy, but productive. Got a lot done.",
+        "typeMessage": "text",
+        "sender": 9,
+        "dateMessage": "2023-07-01T14:20:00.000Z",
+        "status": "read",
+        "giftId": 20,
+        "chatId": 2
+    },
+    {
+        "id": 20,
+        "contenu": "That's great! Keep up the good work.",
+        "typeMessage": "text",
+        "sender": 11,
+        "dateMessage": "2023-07-01T15:10:00.000Z",
+        "status": "read",
+        "giftId": 21,
+        "chatId": 2
+    },
+    {
+        "id": 21,
+        "contenu": "Thanks, buddy! How's the weather on your side?",
+        "typeMessage": "text",
+        "sender": 9,
+        "dateMessage": "2023-07-01T15:45:00.000Z",
+        "status": "read",
+        "giftId": 22,
+        "chatId": 2
+    },
+    {
+        "id": 22,
+        "contenu": "It's been pretty hot lately. Summer is in full swing!",
+        "typeMessage": "text",
+        "sender": 11,
+        "dateMessage": "2023-07-01T16:30:00.000Z",
+        "status": "read",
+        "giftId": 23,
+        "chatId": 2
+    },
+    {
+        "id": 23,
+        "contenu": "I know what you mean. I'm longing for some cool breeze.",
+        "typeMessage": "text",
+        "sender": 9,
+        "dateMessage": "2023-07-01T17:00:00.000Z",
+        "status": "read",
+        "giftId": 24,
+        "chatId": 2
+    },
+    {
+        "id": 24,
+        "contenu": "We should plan a meetup soon. Grab a drink and chill.",
+        "typeMessage": "text",
+        "sender": 11,
+        "dateMessage": "2023-07-01T17:45:00.000Z",
+        "status": "read",
+        "giftId": 25,
+        "chatId": 2
+    },
+    {
+        "id": 25,
+        "contenu": "Hey, Emma! How's your day going?",
+        "typeMessage": "text",
+        "sender": 10,
+        "dateMessage": "2023-07-01T10:00:00.000Z",
+        "status": "read",
+        "giftId": 16,
+        "chatId": 3
+    },
+    {
+        "id": 26,
+        "contenu": "Hi, Franck! It's been a good day so far. How about you?",
+        "typeMessage": "text",
+        "sender": 11,
+        "dateMessage": "2023-07-01T10:15:00.000Z",
+        "status": "read",
+        "giftId": 17,
+        "chatId": 3
+    },
+    {
+        "id": 27,
+        "contenu": "That's great to hear! I had a busy day at work, but it's going well.",
+        "typeMessage": "text",
+        "sender": 10,
+        "dateMessage": "2023-07-01T10:30:00.000Z",
+        "status": "read",
+        "giftId": 18,
+        "chatId": 3
+    },
+    {
+        "id": 28,
+        "contenu": "Busy days can be rewarding. What do you do for work?",
+        "typeMessage": "text",
+        "sender": 11,
+        "dateMessage": "2023-07-01T11:00:00.000Z",
+        "status": "read",
+        "giftId": 19,
+        "chatId": 3
+    },
+    {
+        "id": 29,
+        "contenu": "I work as a software engineer. I enjoy building cool applications!",
+        "typeMessage": "text",
+        "sender": 10,
+        "dateMessage": "2023-07-01T11:30:00.000Z",
+        "status": "read",
+        "giftId": 20,
+        "chatId": 3
+    },
+    {
+        "id": 30,
+        "contenu": "Oh, that's impressive! I've always been interested in technology. What languages do you code in?",
+        "typeMessage": "text",
+        "sender": 11,
+        "dateMessage": "2023-07-01T12:00:00.000Z",
+        "status": "read",
+        "giftId": 21,
+        "chatId": 3
+    },
+    {
+        "id": 31,
+        "contenu": "I mainly work with JavaScript and Python. How about you? Do you have any favorite programming languages?",
+        "typeMessage": "text",
+        "sender": 10,
+        "dateMessage": "2023-07-01T12:30:00.000Z",
+        "status": "read",
+        "giftId": 22,
+        "chatId": 3
+    },
+    {
+        "id": 32,
+        "contenu": "I'm still learning, but I find Python and Java fascinating. I hope to become a skilled programmer someday.",
+        "typeMessage": "text",
+        "sender": 11,
+        "dateMessage": "2023-07-01T13:00:00.000Z",
+        "status": "read",
+        "giftId": 23,
+        "chatId": 3
+    },
+    {
+        "id": 33,
+        "contenu": "That's a great goal to have! Programming is such a valuable skill. If you need any help or guidance, feel free to ask.",
+        "typeMessage": "text",
+        "sender": 10,
+        "dateMessage": "2023-07-01T13:30:00.000Z",
+        "status": "read",
+        "giftId": 24,
+        "chatId": 3
+    },
+    {
+        "id": 34,
+        "contenu": "Thank you, Franck! I appreciate your offer. It's nice to meet someone who shares similar interests.",
+        "typeMessage": "text",
+        "sender": 11,
+        "dateMessage": "2023-07-01T14:00:00.000Z",
+        "status": "read",
+        "giftId": 25,
+        "chatId": 3
+    },
+    {
+        "id": 35,
+        "contenu": "It was good. I had a productive day too.",
+        "typeMessage": "text",
+        "sender": 9,
+        "dateMessage": "2023-07-01T19:30:00.000Z",
+        "status": "read",
+        "giftId": 13,
+        "chatId": 1
+    }
+]
