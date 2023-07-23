@@ -209,11 +209,23 @@ const setupSocketIO = (server) => {
 
         socket.on('rejectLockRequest', async (requestMessage, chatroomId, recipientUserId, senderUserId) => {
             console.log(`rejectLockRequest event received in chatroom ${chatroomId} for message: ${requestMessage}`);
+            // Extract the message id from the received requestMessage
+            const messageId = requestMessage._id;
+
+            // Check if the message exists before attempting to delete it
+            const messageExists = await prisma.message.findFirst({
+                where: {
+                    id: messageId,
+                },
+            });
+
+            if (!messageExists) {
+                console.log(`Message with id ${messageId} does not exist. Skipping delete request...`);
+                return;
+            }
 
             // Delete request from database...
             try {
-                // Extract the message id from the received requestMessage
-                const messageId = requestMessage._id;
 
                 await prisma.message.delete({
                     where: {
@@ -229,17 +241,18 @@ const setupSocketIO = (server) => {
             const requestResponseText = 'Votre proposition de cadenas a été reporté à plus tard. Vous aurez plus de chance la prochaine fois';
             const requestResponseTitle = 'CADENAS REPORTÉ';
 
-            // Emit the request response
-            let requestResponse = {
-                id: uuidv4(),
-                contenu: requestResponseText,
-                title: requestResponseTitle,
-                typeMessage: 'custom',
-                sender: senderUserId,
-                dateMessage: new Date(),
-                status: 'send',
-                chatId: chatroomId,
-            };
+            // Store the request in the database. It should be temporary...
+            let requestResponse = await prisma.message.create({
+                data: {
+                    contenu: requestResponseText,
+                    title: requestResponseTitle,
+                    typeMessage: 'custom',
+                    sender: senderUserId,
+                    dateMessage: new Date(),
+                    status: 'send',
+                    chatId: chatroomId,
+                },
+            });
             console.log('message to emit', requestResponse);
 
             // Emit the request to the recipient's socket
@@ -248,23 +261,28 @@ const setupSocketIO = (server) => {
                 io.to(recipientSocketId).emit('receiveLockResponse', requestResponse);
                 console.log("Lock request response emitted to recipient");
             }
-
-            // Emit the request to the sender's socket
-            /* const senderSocketId = userSockets.get(senderUserId);
-            console.log("sender socket ID", senderSocketId);
-            if (senderSocketId) {
-                io.to(senderSocketId).emit('receiveLockResponse', requestResponse);
-                console.log("Lock request response emitted to sender");
-            } */
         });
 
         socket.on('acceptLockRequest', async (requestMessage, chatroomId, recipientUserId, senderUserId) => {
             console.log(`acceptLockRequest event received in chatroom ${chatroomId} for message: ${requestMessage}`);
 
+            // Extract the message id from the received requestMessage
+            const messageId = requestMessage._id;
+
+            // Check if the message exists before attempting to delete it
+            const messageExists = await prisma.message.findFirst({
+                where: {
+                    id: messageId,
+                },
+            });
+
+            if (!messageExists) {
+                console.log(`Message with id ${messageId} does not exist. Skipping delete request...`);
+                return;
+            }
+
             // Delete request from database...
             try {
-                // Extract the message id from the received requestMessage
-                const messageId = requestMessage._id;
 
                 await prisma.message.delete({
                     where: {
@@ -280,20 +298,22 @@ const setupSocketIO = (server) => {
             const requestResponseText = 'Félicitations, votre proposition de vérouillage a été accepté. Désormais vous êtes le seul membre avec qui cette personne pourra discuter';
             const requestResponseTitle = 'CADENAS ACCEPTÉ';
 
-            // Emit the request response
-            let requestResponse = {
-                id: uuidv4(),
-                contenu: requestResponseText,
-                title: requestResponseTitle,
-                typeMessage: 'custom',
-                sender: senderUserId,
-                dateMessage: new Date(),
-                status: 'send',
-                chatId: chatroomId,
-            };
+            // Store the request in the database. It should be temporary...
+            let requestResponse = await prisma.message.create({
+                data: {
+                    contenu: requestResponseText,
+                    title: requestResponseTitle,
+                    typeMessage: 'custom',
+                    sender: senderUserId,
+                    dateMessage: new Date(),
+                    status: 'send',
+                    chatId: chatroomId,
+                },
+            });
+
             console.log('message to emit', requestResponse);
 
-            // Emit the request to the recipient's socket
+            // Emit the response to the recipient's and sender's socket
             const recipientSocketId = userSockets.get(recipientUserId);
             if (recipientSocketId) {
                 io.to(recipientSocketId).emit('receiveLockResponse', requestResponse);
@@ -307,7 +327,51 @@ const setupSocketIO = (server) => {
                 console.log("Lock request response emitted to sender");
             }
 
-        })
+            // Store both users in the LockedConversations table
+            try {
+                const lockedConversation = await prisma.lockedConversation.create({
+                    data: {
+                        initiatorId: parseInt(senderUserId),
+                        receiverId: parseInt(recipientUserId),
+                    },
+                });
+
+                console.log("Users stored in the LockedConversation table:", lockedConversation);
+            } catch (error) {
+                console.error('Error occurred while storing users in LockedConversation:', error)
+            }
+
+        });
+
+        socket.on('responseMessageRead', async (messageId) => {
+            console.log('Event to delete response message', messageId);
+
+            // Check if the message exists before attempting to delete it
+            const messageExists = await prisma.message.findFirst({
+                where: {
+                    id: messageId,
+                },
+            });
+
+            if (!messageExists) {
+                console.log(`Message with id ${messageId} does not exist. Skipping delete.`);
+                return;
+            }
+
+            // Delete response from database...
+            try {
+
+                await prisma.message.delete({
+                    where: {
+                        id: messageId,
+                    },
+                });
+
+                console.log(`Message with id ${messageId} deleted successfully.`);
+            } catch (error) {
+                console.error('Error occurred while deleting the message:', error);
+            }
+        });
 
         // Event handler for disconnection
         socket.on('disconnect', async () => {

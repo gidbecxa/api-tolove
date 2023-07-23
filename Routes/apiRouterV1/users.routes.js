@@ -23,7 +23,6 @@ module.exports = (apiRouter) => {
     apiRouter.route('/chatrooms/messages/:chatroomId').get(authMiddleware, usersCtrl.getAllChatroomMessages);
     apiRouter.route('/chatrooms/last-message/:chatroomId').get(authMiddleware, usersCtrl.getLastMessage);
     apiRouter.route('/users/get-profile-photo/:id').get(authMiddleware, usersCtrl.getProfilePhoto);
-    apiRouter.route('/photos/presigned-url').post(usersCtrl.getPhotoWithUrl);
 
     // put routes
     apiRouter.route('/users/update/:id').put(ValidatorMiddlewares(updateUserSchema), authMiddleware, usersCtrl.updateUser);
@@ -39,4 +38,8 @@ module.exports = (apiRouter) => {
     apiRouter.route('/create-payment-intent').post(stripeCtrl.createPaymentIntent);
     apiRouter.route('/create-payment-methods').post(stripeCtrl.createPaymentMethods);
     apiRouter.route('/users/update/complementpart1/:id').put(ValidatorMiddlewares(updateProfilePartOneSchema), authMiddleware, usersCtrl.updateProfilPartOne);
+    apiRouter.route('/photos/presigned-url').post(usersCtrl.getPhotoWithUrl);
+    apiRouter.route('/users/get-locked-user/:id').post(usersCtrl.getLockedUsers);
+    apiRouter.route('/users/check-locked').post(authMiddleware, usersCtrl.checkLockedUsers);
+    apiRouter.route('/chatrooms/getchatroom/by-participants').post(authMiddleware, usersCtrl.getChatRoomIdForUsers);
 };

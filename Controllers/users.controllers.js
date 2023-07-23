@@ -294,6 +294,29 @@ module.exports = {
         }
     },
 
+    getChatRoomIdForUsers: async (req, res) => {
+        const { user1, user2 } = req.body;
+
+        try {
+            const chatroom = await prisma.chatRoom.findFirst({
+                where: {
+                    participant: {
+                        array_contains: [parseInt(user1), parseInt(user2)],
+                    },
+                },
+            });
+
+            if (chatroom) {
+                res.json({ chatroomId: chatroom.id });
+            } else {
+                res.json({ chatroomId: null });
+            }
+        } catch (error) {
+            console.error('Error occurred while querying ChatRoom:', error);
+            res.status(500).json({ error: 'An error occurred while fetching the chatroom ID.' });
+        }
+    },
+
     /* getProfilePhoto: async (req, res) => {
         const { id } = req.params;
 
@@ -515,7 +538,62 @@ module.exports = {
         }
     },
 
-    //----------------------- udpate indivuduel -------------------------------
+    getLockedUsers: async (req, res) => {
+        const { id } = req.params;
+
+        try {
+            const lockedConversation = await prisma.lockedConversation.findFirst({
+                where: {
+                    OR: [
+                        { initiatorId: parseInt(id) },
+                        { receiverId: parseInt(id) },
+                    ],
+                },
+            });
+
+            if (!lockedConversation) {
+                // return null;
+                res.json(null);
+            }
+
+            // If the current user is the initiator, return the receiverId
+            if (lockedConversation.initiatorId === parseInt(id)) {
+                // return lockedConversation.receiverId;
+                res.json({ userLockedWith: lockedConversation.receiverId });
+            }
+
+            // If the current user is the receiver, return the initiatorId
+            //   return lockedConversation.initiatorId;
+            res.json({ userLockedWith: lockedConversation.initiatorId });
+        } catch (error) {
+            console.error('Error occurred while querying LockedConversation table:', error);
+            return null;
+        }
+    },
+
+    checkLockedUsers: async (req, res) => {
+        console.log('checking locked status...')
+        const { user1, user2 } = req.body;
+
+        try {
+            const lockedConversation = await prisma.lockedConversation.findFirst({
+                where: {
+                    OR: [
+                        { initiatorId: parseInt(user1), receiverId: parseInt(user2) },
+                        { initiatorId: parseInt(user2), receiverId: parseInt(user1) },
+                    ],
+                },
+            });
+
+            const areUsersLocked = !!lockedConversation;
+            res.json({ areUsersLocked });
+        } catch (error) {
+            console.error('Error occurred while querying LockedConversation table:', error);
+            return false;
+        }
+    },
+
+    //----------------------- udpate indivudual -------------------------------
 
     updateHobbies: async function (req, res) {
 
