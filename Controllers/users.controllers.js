@@ -317,66 +317,6 @@ module.exports = {
         }
     },
 
-    /* getProfilePhoto: async (req, res) => {
-        const { id } = req.params;
-
-        const user = await prisma.user.findUnique({
-            where: { id: parseInt(id) },
-            select: { photoProfil: true },
-        });
-
-        if (!user || !user.photoProfil) {
-            return res.status(404).json({ error: 'Profile photo not found' });
-        }
-
-        const photoProfilUrl = user.photoProfil;
-        const params = {
-            Bucket: 'user.toloveapp-storage',
-            Key: photoProfilUrl.replace(`https://s3.eu-west-2.amazonaws.com/user.toloveapp-storage/`, ''),
-        };
-
-        try {
-                // const response = await myS3Client.send(command);
-
-                // Read the fetched image data as a Buffer
-                // const imageBuffer = await new Promise((resolve, reject) => {
-                //     const chunks = [];
-                //     response.Body.on('data', (chunk) => chunks.push(chunk));
-                //     response.Body.on('error', (err) => reject(err));
-                //     response.Body.on('end', () => resolve(Buffer.concat(chunks)));
-                // });
-                // console.log(imageBuffer);
-
-                // Determine the file extension of the S3 object
-                // const fileExtension = extname(objectParams.Key).toLowerCase();
-                // const contentTypeMap = {
-                //     '.jpg': 'image/jpeg',
-                //     '.jpeg': 'image/jpeg',
-                //     '.png': 'image/png',
-                // }
-                // const contentType = contentTypeMap[fileExtension] || 'application/octet-stream';
-
-                // res.setHeader('Content-Type', contentType);
-                // res.setHeader('Content-Type', 'image/jpeg');
-                // res.setHeader('Content-Length', imageBuffer.length);
-                // res.status(200).end(imageBuffer);
-
-                // Trying another approach different from the Buffer approach above
-                const data = await myS3Client.send(command);
-                const photoStream = data.Body;
-                // console.log(photoStream);
-
-                res.setHeader('Content-Type', 'image/jpeg');
-                photoStream.pipe(res);
-            } catch (error) {
-                console.error(error);
-            }
-        } catch (error) {
-            console.error("Error fetching profile photo: ", error);
-            res.status(500).json({ success: false, error: "Failed to fetch profile photo" });
-        }
-    }, */
-
     getProfilePhoto: async (req, res) => {
         const { id } = req.params;
 
@@ -540,6 +480,7 @@ module.exports = {
 
     getLockedUsers: async (req, res) => {
         const { id } = req.params;
+        console.log('getLockedUsers: id of the current user:', id);
 
         try {
             const lockedConversation = await prisma.lockedConversation.findFirst({
@@ -552,18 +493,17 @@ module.exports = {
             });
 
             if (!lockedConversation) {
-                // return null;
-                res.json(null);
+                res.json({userLockedWith: null});
+                return;
             }
 
             // If the current user is the initiator, return the receiverId
             if (lockedConversation.initiatorId === parseInt(id)) {
-                // return lockedConversation.receiverId;
                 res.json({ userLockedWith: lockedConversation.receiverId });
+                // return;
             }
 
             // If the current user is the receiver, return the initiatorId
-            //   return lockedConversation.initiatorId;
             res.json({ userLockedWith: lockedConversation.initiatorId });
         } catch (error) {
             console.error('Error occurred while querying LockedConversation table:', error);
@@ -764,13 +704,12 @@ module.exports = {
     },
 
 
-    // å mettre probablement deans utils
     updateCoins: async function (req, res) {
 
         const { id } = req.params
         const { coins } = req.body
 
-        User.update({
+        prisma.user.update({
             where: {
                 id: parseInt(id),
             },

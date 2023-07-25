@@ -32,6 +32,7 @@ module.exports = (apiRouter) => {
     apiRouter.route('/users/update/description/:id').put(ValidatorMiddlewares(updateUserDescriptionSchema), authMiddleware, usersCtrl.updateDescription);
     apiRouter.route('/users/update/profilePhoto/:id').put(authMiddleware, upload.single('image'), usersCtrl.updatePicture);
     apiRouter.route('/users/update/uploadPhoto/:id').put(authMiddleware, upload.single('image'), usersCtrl.uploadPhoto);
+    apiRouter.route('/users/update/coins/:id').put(authMiddleware, usersCtrl.updateCoins);
 
     // post routes
     apiRouter.route('/users/join-room').post(twilioCtrl.joinRoom);
