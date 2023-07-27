@@ -74,17 +74,33 @@ const setupSocketIO = (server) => {
 
             // Check chatroomId. If 0, create a new chatroomId
             if (chatroomId === 0) {
-                const participant = [senderUserId, recipientUserId];
-
-                // Create a new chatroom in the database
-                const createdChatroom = await prisma.chatRoom.create({
-                    data: {
-                        participant: participant,
+                // Check if a chatroom exists with the sender and recipient as participants
+                const existingChatroom = await prisma.chatRoom.findFirst({
+                    where: {
+                        OR: [
+                            { participant: { equals: [senderUserId, recipientUserId] } },
+                            { participant: { equals: [recipientUserId, senderUserId] } }
+                        ],
                     },
                 });
 
-                console.log('New chatroom created:', createdChatroom);
-                chatroomId = createdChatroom.id;
+                if (existingChatroom) {
+                    // Chatroom already exists
+                    chatroomId = existingChatroom.id;
+                } else {
+                    // Create a new chatroom
+                    const participant = [senderUserId, recipientUserId];
+
+                    // Create a new chatroom in the database
+                    const createdChatroom = await prisma.chatRoom.create({
+                        data: {
+                            participant: participant,
+                        },
+                    });
+
+                    console.log('New chatroom created:', createdChatroom);
+                    chatroomId = createdChatroom.id;
+                }
             }
 
             // Store the message in the database before emitting to the user
