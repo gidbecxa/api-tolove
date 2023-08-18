@@ -136,7 +136,7 @@ module.exports = {
         }
     },
 
-    // Controller to update user data from Complementpart1 screen
+    // Controller to update user's data from Complementpart1 screen
     updateProfilPartOne: async (req, res) => {
         const { id } = req.params;
         // console.log('id: ', id);
@@ -459,17 +459,30 @@ module.exports = {
         try {
             const { id } = req.params;
 
-            const matches = await prisma.match.findMany({
+            const userMatches = await prisma.match.findMany({
                 where: {
                     toId: parseInt(id),
                     typeMatch: 'normal',
                     isConfirm: false,
                 },
-                /* include: {
-                    from: true,
-                    to: true,
-                }, */
             });
+
+            const filteredMatches = await Promise.all(
+                userMatches.map(async (match) => {
+                    const chatroom = await prisma.chatRoom.findFirst({
+                        where: {
+                            participant: { array_contains: [parseInt(id), parseInt(match.fromId)] },
+                        },
+                    });
+
+                    if (!chatroom) {
+                        return match;
+                    }
+                    return null;
+                })
+            );
+
+            const matches = filteredMatches.filter((match) => match !== null);
 
             res.status(200).json({ success: true, matches });
         } catch (error) {
@@ -497,17 +510,21 @@ module.exports = {
                 return;
             }
 
+            let userLockedWith;
+
             // If the current user is the initiator, return the receiverId
             if (lockedConversation.initiatorId === parseInt(id)) {
-                res.json({ userLockedWith: lockedConversation.receiverId });
-                // return;
+                userLockedWith = lockedConversation.receiverId;
+            } 
+            // If the current user is the receiver, return the initiatorId
+            else {
+                userLockedWith = lockedConversation.initiatorId;
             }
 
-            // If the current user is the receiver, return the initiatorId
-            res.json({ userLockedWith: lockedConversation.initiatorId });
+            res.json({ userLockedWith });
         } catch (error) {
             console.error('Error occurred while querying LockedConversation table:', error);
-            return null;
+            res.status(500).json({ error: 'An error occurred' });
         }
     },
 
@@ -529,7 +546,7 @@ module.exports = {
             res.json({ areUsersLocked });
         } catch (error) {
             console.error('Error occurred while querying LockedConversation table:', error);
-            return false;
+            res.status(500).json({ error: 'An error occurred' });
         }
     },
 
