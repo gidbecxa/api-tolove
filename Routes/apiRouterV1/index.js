@@ -1,7 +1,7 @@
 var express = require('express');
 const authRoutes = require('./auth.routes')
 const usersRoutes = require('./users.routes');
-
+const adminRoutes = require('./agents.routes');
 
 exports.router = (function() {
 
@@ -12,6 +12,9 @@ exports.router = (function() {
 
     // Users routes
     usersRoutes(apiRouter)
+
+    // Admin routes
+    adminRoutes(apiRouter)
 
     return apiRouter;
     

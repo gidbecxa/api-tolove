@@ -3,11 +3,10 @@
 
 generator client {
   provider = "prisma-client-js"
-  binaryTargets = ["native"]
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -38,6 +37,7 @@ model User {
   secondOtherPhoto String?
   thirdOtherPhoto String?
   role Role @default(USER)
+  assignedAgent Int?
   deviceToken String?
   to Match[] @relation("to")
   from   Match[] @relation("from")
@@ -91,6 +91,8 @@ model ChatRoom {
   lastMessage String?  @db.VarChar(1000)
   lastMessageSender Int?
   lastMessageStatus LastMessageStatus @default(pending)
+  isSentByAgent Boolean  @default(false)
+  agentId Int?
   messages     Message[]
 }
 
@@ -112,6 +114,7 @@ model Message {
   sender      Int
   dateMessage DateTime
   status      Status    @default(pending)
+  isSentByAgent Boolean  @default(false)
 // gift       Gift      @relation(fields: [giftId], references: [id])
 // giftId     Int       @unique
   chatRoom    ChatRoom  @relation(fields: [chatId], references: [id])

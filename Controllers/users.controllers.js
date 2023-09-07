@@ -33,6 +33,7 @@ module.exports = {
                         equals: req.user.id,
                     }
                 },
+                role: 'USER',
                 genre: preference,
                 to: {
                     // to get profiles that the user hasn't matched with

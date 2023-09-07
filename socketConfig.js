@@ -69,7 +69,7 @@ const setupSocketIO = (server) => {
         });
 
         socket.on('sendMessage', async (message, recipientUserId, senderUserId, chatroomId) => {
-            //console.log(`{ message: ${message}, recepient: ${recipientUserId}, sender: ${senderUserId}, chatroom: ${chatroomId}}`);
+            console.log(`{ message event: ${message}, recepient: ${recipientUserId}, sender: ${senderUserId}, chatroom: ${chatroomId}}`);
             // console.log('Socket: message received', message.text);
 
             // Check chatroomId. If 0, create a new chatroomId
@@ -104,7 +104,6 @@ const setupSocketIO = (server) => {
             }
 
             // Store the message in the database before emitting to the user
-
             let storedMessage;
 
             // Will check if the message object contains an image...
@@ -387,6 +386,110 @@ const setupSocketIO = (server) => {
             } catch (error) {
                 console.error('Error occurred while deleting the message:', error);
             }
+        });
+
+        socket.on('sendMessageFromAgent', async (agentId, message, recipientUserId, senderUserId, chatroomId) => {
+            console.log(`{ message from agent event: ${agentId}, ${message}, recepient: ${recipientUserId}, sender: ${senderUserId}, chatroom: ${chatroomId}}`);
+            // console.log('Socket: message received', message.text);
+
+            // Check chatroomId. If 0, create a new chatroomId
+            if (chatroomId === 0) {
+                // Check if a chatroom exists with the sender and recipient as participants
+                const existingChatroom = await prisma.chatRoom.findFirst({
+                    where: {
+                        OR: [
+                            { participant: { equals: [senderUserId, recipientUserId] } },
+                            { participant: { equals: [recipientUserId, senderUserId] } }
+                        ],
+                    },
+                });
+
+                if (existingChatroom) {
+                    // Chatroom already exists
+                    chatroomId = existingChatroom.id;
+                } else {
+                    // Create a new chatroom
+                    const participant = [senderUserId, recipientUserId];
+
+                    // Create a new chatroom in the database
+                    const createdChatroom = await prisma.chatRoom.create({
+                        data: {
+                            participant: participant,
+                            isSentByAgent: true,
+                            agentId: agentId,
+                        },
+                    });
+
+                    console.log('New chatroom created:', createdChatroom);
+                    chatroomId = createdChatroom.id;
+                }
+            }
+
+            // Store the message in the database before emitting to the user
+            let storedMessage;
+
+            // Will check if the message object contains an image...
+            if (message.image) {
+                const presignedURL = message.image;
+                const objectURL = getObjectURLFromPresignedURL(presignedURL);
+
+                storedMessage = await prisma.message.create({
+                    data: {
+                        contenu: message.text || "",
+                        typeMessage: 'image',
+                        mediaUrl: objectURL,
+                        sender: senderUserId,
+                        dateMessage: message.createdAt,
+                        status: 'send',
+                        isSentByAgent: true,
+                        chatId: chatroomId,
+                    },
+                });
+            } else {
+                storedMessage = await prisma.message.create({
+                    data: {
+                        contenu: message.text || "",
+                        typeMessage: 'text',
+                        sender: senderUserId,
+                        // dateMessage: message.createdAt,
+                        dateMessage: new Date(),
+                        status: 'send',
+                        isSentByAgent: true,
+                        chatId: chatroomId,
+                    },
+                });
+            }
+            console.log("Stored message", storedMessage);
+
+            // Update the ChatRoom table here
+
+            // Emit the message to the recipient's socket
+            const recipientSocketId = userSockets.get(recipientUserId);
+            if (recipientSocketId) {
+                io.to(recipientSocketId).emit('receiveMessage', storedMessage);
+                console.log("Message emitted to recipient");
+            }
+
+            // Emit the message to the sender's socket
+            const senderSocketId = userSockets.get(senderUserId);
+            console.log("sender socket ID", senderSocketId);
+            if (senderSocketId) {
+                io.to(senderSocketId).emit('receiveMessage', storedMessage);
+                console.log("Message emitted to sender");
+            }
+
+            // Update the last message and status in the chatroom
+            await prisma.chatRoom.update({
+                where: { id: chatroomId },
+                data: {
+                    lastMessage: message.image ? 'Photo' : message.text,
+                    lastMessageSender: senderUserId,
+                    lastMessageStatus: 'send',
+                },
+            });
+
+            // Send an event to update recent messages list
+            io.emit('updateChatroom', chatroomId);
         });
 
         // Event handler for disconnection
