@@ -280,16 +280,10 @@ module.exports = {
 
             // Find all chatrooms where agentId matches
             const chatRooms = await prisma.chatRoom.findMany({
-                // where: { agentId: parseInt(agentId) },
-                where: {
-                    NOT: [
-                        { agentId: { equals: parseInt(agentId) } },
-                        { agentId: { not: { equals: null } } },
-                    ],
-                },
+                where: { agentId: parseInt(agentId) },
                 include: {
                     messages: {
-                        where: { isSentByAgent: true }, // Filter messages by isSentByAgent
+                        where: { isSentByAgent: false }, // Filter messages by isSentByAgent
                     },
                 },
             });
