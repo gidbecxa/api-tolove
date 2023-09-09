@@ -70,6 +70,7 @@ module.exports = {
                             sender: true,
                             dateMessage: true,
                             status: true,
+                            isSentByAgent: true,
                         },
                         orderBy: {
                             dateMessage: 'desc',
@@ -79,7 +80,15 @@ module.exports = {
                 },
             });
 
-            const sortedChatrooms = chatrooms.sort((a, b) => {
+            const filteredChatroms = chatrooms.filter((chatroom) => {
+                if (chatroom.messages.length > 0) {
+                    const latestMessage = chatroom.messages[0];
+                    return !latestMessage.isSentByAgent
+                }
+                return true;
+            })
+
+            const sortedChatrooms = filteredChatroms.sort((a, b) => {
                 const aLatestMessage = a.messages[0];
                 const bLatestMessage = b.messages[0];
 
@@ -266,38 +275,44 @@ module.exports = {
 
     countAgentMessages: async (req, res) => {
         try {
-          const { agentId } = req.params;
-          console.log("Agent ID:", agentId);
-      
-          // Find all chatrooms where agentId matches
-          const chatRooms = await prisma.chatRoom.findMany({
-            where: { agentId: parseInt(agentId) },
-            include: {
-              messages: {
-                where: { isSentByAgent: true }, // Filter messages by isSentByAgent
-              },
-            },
-          });
+            const { agentId } = req.params;
+            console.log("Agent ID:", agentId);
 
-          let totalMessages = 0;
-      
-          if (!chatRooms || chatRooms.length === 0) {
-            return res.status(404).json({ totalMessages });
-          }
-      
-          // Calculate the total number of messages sent by the agent
-        //   let totalMessages = 0;
-          chatRooms.forEach((chatRoom) => {
-            totalMessages += chatRoom.messages.length;
-          });
-      
-          return res.json({ totalMessages });
+            // Find all chatrooms where agentId matches
+            const chatRooms = await prisma.chatRoom.findMany({
+                // where: { agentId: parseInt(agentId) },
+                where: {
+                    NOT: [
+                        { agentId: { equals: parseInt(agentId) } },
+                        { agentId: { not: { equals: null } } },
+                    ],
+                },
+                include: {
+                    messages: {
+                        where: { isSentByAgent: true }, // Filter messages by isSentByAgent
+                    },
+                },
+            });
+
+            let totalMessages = 0;
+
+            if (!chatRooms || chatRooms.length === 0) {
+                return res.status(404).json({ totalMessages });
+            }
+
+            // Calculate the total number of messages sent by the agent
+            //   let totalMessages = 0;
+            chatRooms.forEach((chatRoom) => {
+                totalMessages += chatRoom.messages.length;
+            });
+
+            return res.json({ totalMessages });
         } catch (error) {
-          console.error('Error counting agent messages:', error);
-          res.status(500).json({ error: 'Internal server error' });
+            console.error('Error counting agent messages:', error);
+            res.status(500).json({ error: 'Internal server error' });
         }
-      },
-      
+    },
+
 
     getUserMatches: async (req, res) => {
         try {
