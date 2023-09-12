@@ -1,7 +1,7 @@
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient();
 const bcrypt = require("bcrypt");
-const { PutObjectCommand, GetObjectCommand, S3Client } = require('@aws-sdk/client-s3');
+const { PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const { myS3Client } = require('../Utils/s3Client');
 const fs = require('fs');
@@ -163,6 +163,60 @@ module.exports = {
         }
     },
 
+    updateProfilPartTwo: async (req, res) => {
+        const { id } = req.params;
+        console.log('Update data step 2 for user ', id);
+        console.log('Request body ', req.body);
+        const { hobbies, description, preferencePays, disponiblePour } = req.body;
+
+        if (!req.file) {
+            return res.status(400).json({ error: 'No file uploaded', msg: 'No file uploaded'  });
+        }
+
+        const file = req.file;
+        const { filename, path } = file;
+
+        try {
+            const uploadParams = {
+                Bucket: 'user.toloveapp-storage',
+                Key: `user${id}/${filename}`,
+                Body: fs.createReadStream(path),
+                ContentType: file.mimetype
+            };
+
+            try {
+                const uploadResponse = await myS3Client.send(new PutObjectCommand(uploadParams));
+                console.log(
+                    "Successfully created " +
+                    uploadParams.Key +
+                    " and uploaded it to " +
+                    uploadParams.Bucket +
+                    "/" + uploadParams.Key
+                );
+            } catch (err) {
+                console.log("Error", err);
+            }
+
+            const imageUrl = `https://s3.eu-west-2.amazonaws.com/${uploadParams.Bucket}/${uploadParams.Key}`;
+
+            const user = await prisma.user.update({
+                where: { id: parseInt(id) },
+                data: {
+                    photoProfil: imageUrl,
+                    hobbies: hobbies,
+                    description: description,
+                    preferencePays: preferencePays,
+                    disponiblePour: disponiblePour
+                },
+            });
+
+            res.status(200).json({ success: true, user })
+        } catch (error) {
+            console.error("Error updating user: ", error);
+            res.status(500).json({ success: false, error: "Failed to update user" })
+        }
+    },
+
     updateUser: async (req, res) => {
 
         const { id } = req.params
@@ -245,6 +299,7 @@ module.exports = {
     //----------------------- get in-app data -------------------------------
     getChatroomsByParticipant: async (req, res) => {
         const { id } = req.params;
+        console.log('Getting chatrooms for user', id);
 
         try {
             console.log("User", id)
@@ -317,6 +372,66 @@ module.exports = {
             res.status(500).json({ error: 'An error occurred while fetching the chatroom ID.' });
         }
     },
+
+    /* getProfilePhoto: async (req, res) => {
+        const { id } = req.params;
+
+        const user = await prisma.user.findUnique({
+            where: { id: parseInt(id) },
+            select: { photoProfil: true },
+        });
+
+        if (!user || !user.photoProfil) {
+            return res.status(404).json({ error: 'Profile photo not found' });
+        }
+
+        const photoProfilUrl = user.photoProfil;
+        const params = {
+            Bucket: 'user.toloveapp-storage',
+            Key: photoProfilUrl.replace(`https://s3.eu-west-2.amazonaws.com/user.toloveapp-storage/`, ''),
+        };
+
+        try {
+                // const response = await myS3Client.send(command);
+
+                // Read the fetched image data as a Buffer
+                // const imageBuffer = await new Promise((resolve, reject) => {
+                //     const chunks = [];
+                //     response.Body.on('data', (chunk) => chunks.push(chunk));
+                //     response.Body.on('error', (err) => reject(err));
+                //     response.Body.on('end', () => resolve(Buffer.concat(chunks)));
+                // });
+                // console.log(imageBuffer);
+
+                // Determine the file extension of the S3 object
+                // const fileExtension = extname(objectParams.Key).toLowerCase();
+                // const contentTypeMap = {
+                //     '.jpg': 'image/jpeg',
+                //     '.jpeg': 'image/jpeg',
+                //     '.png': 'image/png',
+                // }
+                // const contentType = contentTypeMap[fileExtension] || 'application/octet-stream';
+
+                // res.setHeader('Content-Type', contentType);
+                // res.setHeader('Content-Type', 'image/jpeg');
+                // res.setHeader('Content-Length', imageBuffer.length);
+                // res.status(200).end(imageBuffer);
+
+                // Trying another approach different from the Buffer approach above
+                const data = await myS3Client.send(command);
+                const photoStream = data.Body;
+                // console.log(photoStream);
+
+                res.setHeader('Content-Type', 'image/jpeg');
+                photoStream.pipe(res);
+            } catch (error) {
+                console.error(error);
+            }
+        } catch (error) {
+            console.error("Error fetching profile photo: ", error);
+            res.status(500).json({ success: false, error: "Failed to fetch profile photo" });
+        }
+    }, */
 
     getProfilePhoto: async (req, res) => {
         const { id } = req.params;
@@ -507,7 +622,7 @@ module.exports = {
             });
 
             if (!lockedConversation) {
-                res.json({userLockedWith: null});
+                res.json({ userLockedWith: null });
                 return;
             }
 
@@ -516,7 +631,7 @@ module.exports = {
             // If the current user is the initiator, return the receiverId
             if (lockedConversation.initiatorId === parseInt(id)) {
                 userLockedWith = lockedConversation.receiverId;
-            } 
+            }
             // If the current user is the receiver, return the initiatorId
             else {
                 userLockedWith = lockedConversation.initiatorId;
@@ -724,8 +839,9 @@ module.exports = {
 
     updateCoins: async function (req, res) {
 
-        const { id } = req.params
-        const { coins } = req.body
+        const { id } = req.params;
+        const { coins } = req.body;
+        console.log('Body:', req.body);
 
         prisma.user.update({
             where: {

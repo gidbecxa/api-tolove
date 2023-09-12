@@ -9,18 +9,6 @@ exports.registerSchema = yup.object({
     // password: yup.string().required(errorTypeOne).matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/, "Minimum huit caractères, au moins une lettre majuscule, une lettre minuscule et un chiffre")
 });
 
-exports.agentUserSchema = yup.object({
-    phoneNumber: yup.string().required('Phone number is required'),
-    username: yup.string().required('Username is required'),
-    birthday: yup.date().required('Birthday is required'),
-    description: yup.string().required('Description is required'),
-    preference: yup.string().required('Preference is required'),
-    genre: yup.string().required('Genre is required'),
-    passion: yup.string().required('Passion is required'),
-    pays: yup.string().required('Pays is required'),
-    villes: yup.string().required('Villes is required'),
-});
-
 exports.verifySchema = yup.object().shape({
     code: yup.string().required().length(6)
 });
@@ -45,6 +33,14 @@ exports.updateProfilePartOneSchema = yup.object({
     ville: yup.string().required(errorTypeOne)
 });
 
+exports.updateProfilePartTwoSchema = yup.object({
+    image: yup.string().required(errorTypeOne),
+    hobbies: yup.string().required(errorTypeOne),
+    description: yup.string().required(errorTypeOne),
+    preferencePays: yup.string().required(errorTypeOne),
+    disponiblePour: yup.string().required(errorTypeOne),
+});
+
 exports.updateUserSchema = yup.object({
     email: yup.string().required(errorTypeOne).email("Email Invalide"),
     password: yup.string().required(),
@@ -60,4 +56,16 @@ exports.updateUserDescriptionSchema = yup.object({
 
 exports.updateUserPhotoSchema = yup.object({
     photoProfil: yup.string().required(errorTypeOne)
+});
+
+exports.agentUserSchema = yup.object({
+    phoneNumber: yup.string().required('Phone number is required'),
+    username: yup.string().required('Username is required'),
+    birthday: yup.date().required('Birthday is required'),
+    description: yup.string().required('Description is required'),
+    preference: yup.string().required('Preference is required'),
+    genre: yup.string().required('Genre is required'),
+    passion: yup.string().required('Passion is required'),
+    pays: yup.string().required('Pays is required'),
+    villes: yup.string().required('Villes is required'),
 });

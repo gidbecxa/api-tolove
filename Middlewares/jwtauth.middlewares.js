@@ -61,6 +61,8 @@ exports.authMiddleware = async (req, res, next) => {
           role: true,
           villes: true,
           deviceToken: true,
+          preferencePays: true,
+          disponiblePour: true
         },
       }
     );

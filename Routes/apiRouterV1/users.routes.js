@@ -6,7 +6,7 @@ const { authMiddleware } = require('../../Middlewares/jwtauth.middlewares');
 const { ValidatorMiddlewares } = require('../../Middlewares/validator.middlewares');
 
 const {
-    updateUserSchema, updateHobbiesSchema, updateUserDescriptionSchema, updateProfilePartOneSchema, updateUserPhotoSchema
+    updateUserSchema, updateHobbiesSchema, updateUserDescriptionSchema, updateProfilePartOneSchema, updateProfilePartTwoSchema, updateUserPhotoSchema
 } = require('../../Utils/validationShema');
 const { upload } = require('../../multerConfig');
 
@@ -25,6 +25,8 @@ module.exports = (apiRouter) => {
     apiRouter.route('/users/get-profile-photo/:id').get(authMiddleware, usersCtrl.getProfilePhoto);
 
     // put routes
+    apiRouter.route('/users/update/complementpart1/:id').put(ValidatorMiddlewares(updateProfilePartOneSchema), authMiddleware, usersCtrl.updateProfilPartOne);
+    apiRouter.route('/users/update/complementPart2/:id').put(authMiddleware, upload.single('image'), usersCtrl.updateProfilPartTwo);
     apiRouter.route('/users/update/:id').put(ValidatorMiddlewares(updateUserSchema), authMiddleware, usersCtrl.updateUser);
     apiRouter.route('/users/update/certified/:id').put(authMiddleware, usersCtrl.updateCertified);
     apiRouter.route('/users/update/completed/:id').put(authMiddleware, usersCtrl.updateCompleted);
@@ -38,7 +40,6 @@ module.exports = (apiRouter) => {
     apiRouter.route('/users/join-room').post(twilioCtrl.joinRoom);
     apiRouter.route('/create-payment-intent').post(stripeCtrl.createPaymentIntent);
     apiRouter.route('/create-payment-methods').post(stripeCtrl.createPaymentMethods);
-    apiRouter.route('/users/update/complementpart1/:id').put(ValidatorMiddlewares(updateProfilePartOneSchema), authMiddleware, usersCtrl.updateProfilPartOne);
     apiRouter.route('/photos/presigned-url').post(usersCtrl.getPhotoWithUrl);
     apiRouter.route('/users/get-locked-user/:id').post(usersCtrl.getLockedUsers);
     apiRouter.route('/users/check-locked').post(authMiddleware, usersCtrl.checkLockedUsers);

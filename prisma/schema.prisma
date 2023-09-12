@@ -32,6 +32,8 @@ model User {
   pays String?
   villes String?
   isOnline Boolean  @default(false)
+  preferencePays String?
+  disponiblePour String?
   isVideoEnabled Boolean @default(false)
   isLockEnabled Boolean @default(false)
   firstOtherPhoto String?
