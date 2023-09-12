@@ -89,9 +89,9 @@ module.exports = {
 
     createUserByAgent: async function (req, res) {
         // console.log("Request body:", req.body);
-        const { username, pays, phoneNumber, birthday, description, preference, genre, hobbies, ville } = req.body;
+        const { username, pays, phoneNumber, birthday, description, preference, genre, hobbies, ville, preferencePays, disponiblePour } = req.body;
         const birthdayFormatted = new Date(birthday);
-        console.log("Attempting to create user:", { username, pays, phoneNumber, birthdayFormatted, description, preference, genre, hobbies, ville });
+        console.log("Attempting to create user:", { username, pays, phoneNumber, birthdayFormatted, description, preference, genre, hobbies, ville, preferencePays, disponiblePour });
         const { agentId } = req.params;
         console.log("Attempting to create user for agent:", { agentId });
 
@@ -152,6 +152,8 @@ module.exports = {
                     pays: pays,
                     villes: ville,
                     assignedAgent: parseInt(agentId),
+                    preferencePays: preferencePays,
+                    disponiblePour: disponiblePour
                 },
             });
 
@@ -161,7 +163,6 @@ module.exports = {
             res.status(500).json({ success: false, error: "Failed to create user" });
         }
     },
-
     /* verify: async function (req, res) {
         // const { verificationCode: code } = req.body;
         const { code, phoneNumber, pays } = req.body;
