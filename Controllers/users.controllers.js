@@ -141,7 +141,7 @@ module.exports = {
     updateProfilPartOne: async (req, res) => {
         const { id } = req.params;
         // console.log('id: ', id);
-        const { username, genre, preference, birthday, ville } = req.body;
+        const { username, genre, preference, preferencePays, birthday, ville } = req.body;
         // console.log('Request body ', req.body);
 
         try {
@@ -152,7 +152,8 @@ module.exports = {
                     genre: genre,
                     preference: preference,
                     birthday: birthday,
-                    villes: ville
+                    villes: ville,
+                    preferencePays: preferencePays,
                 },
             });
 
@@ -167,7 +168,7 @@ module.exports = {
         const { id } = req.params;
         console.log('Update data step 2 for user ', id);
         console.log('Request body ', req.body);
-        const { hobbies, description, preferencePays, disponiblePour } = req.body;
+        const { hobbies, description, disponiblePour } = req.body;
 
         if (!req.file) {
             return res.status(400).json({ error: 'No file uploaded', msg: 'No file uploaded'  });
@@ -203,9 +204,9 @@ module.exports = {
                 where: { id: parseInt(id) },
                 data: {
                     photoProfil: imageUrl,
-                    hobbies: hobbies,
+                    // hobbies: hobbies,
                     description: description,
-                    preferencePays: preferencePays,
+                    // preferencePays: preferencePays,
                     disponiblePour: disponiblePour
                 },
             });

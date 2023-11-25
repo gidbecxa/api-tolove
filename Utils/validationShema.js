@@ -29,15 +29,16 @@ exports.updateProfilePartOneSchema = yup.object({
     username: yup.string().required(errorTypeOne),
     genre: yup.string().required().oneOf(["male", "female", "neutre"], "Genre invalide"),
     preference: yup.string().required().oneOf(["male", "female", "neutre"], "Genre invalide"),
+    preferencePays: yup.string().required(errorTypeOne),
     birthday: yup.date().required(),
     ville: yup.string().required(errorTypeOne)
 });
 
 exports.updateProfilePartTwoSchema = yup.object({
     image: yup.string().required(errorTypeOne),
-    hobbies: yup.string().required(errorTypeOne),
+    // hobbies: yup.string().required(errorTypeOne),
     description: yup.string().required(errorTypeOne),
-    preferencePays: yup.string().required(errorTypeOne),
+    // preferencePays: yup.string().required(errorTypeOne),
     disponiblePour: yup.string().required(errorTypeOne),
 });
 

@@ -358,6 +358,63 @@ const setupSocketIO = (server) => {
 
         });
 
+        socket.on('unlockChat', async (recipientUserId, senderUserId, chatroomId) => {
+            console.log(`unlockChat event received in chatroom ${chatroomId} from user ${senderUserId}`);
+
+            const unlockText = 'La conversation avec ce membre a été déverouillée. Désormais vous pourrez discuter avec d\'autres membres.';
+            const unlockTitle = 'CADENAS DÉBLOQUÉ';
+
+            // Store the alert in the database. It will be temporary
+            let unlockMessage = await prisma.message.create({
+                data: {
+                    contenu: unlockText,
+                    title: unlockTitle,
+                    typeMessage: 'custom',
+                    sender: senderUserId,
+                    dateMessage: new Date(),
+                    status: 'send',
+                    chatId: chatroomId,
+                },
+            });
+            console.log('message to emit', unlockMessage);
+
+            // Emit the response to the recipient's and sender's socket
+            const recipientSocketId = userSockets.get(recipientUserId);
+            if (recipientSocketId) {
+                io.to(recipientSocketId).emit('receiveUnlockAlert', unlockMessage);
+                console.log("Lock request response emitted to recipient");
+            }
+
+            const senderSocketId = userSockets.get(senderUserId);
+            console.log("sender socket ID", senderSocketId);
+            if (senderSocketId) {
+                io.to(senderSocketId).emit('receiveUnlockAlert', unlockMessage);
+                console.log("Lock request response emitted to sender");
+            }
+
+            // Delete the corresponding row from the LockedConversation table
+            try {
+                await prisma.lockedConversation.deleteMany({
+                    where: {
+                        OR: [
+                            {
+                                initiatorId: parseInt(senderUserId),
+                                receiverId: parseInt(recipientUserId),
+                            },
+                            {
+                                initiatorId: parseInt(recipientUserId),
+                                receiverId: parseInt(senderUserId),
+                            },
+                        ],
+                    },
+                });
+
+                console.log('Row for locked conversation between users deleted successfully!')
+            } catch (error) {
+                console.error('Error occured while deleting users\'s LockedConversation row', error);
+            }
+        });
+
         socket.on('responseMessageRead', async (messageId) => {
             console.log('Event to delete response message', messageId);
 

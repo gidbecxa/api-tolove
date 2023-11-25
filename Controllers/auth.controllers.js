@@ -163,6 +163,7 @@ module.exports = {
             res.status(500).json({ success: false, error: "Failed to create user" });
         }
     },
+
     /* verify: async function (req, res) {
         // const { verificationCode: code } = req.body;
         const { code, phoneNumber, pays } = req.body;
