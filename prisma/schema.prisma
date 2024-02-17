@@ -144,8 +144,25 @@ model Gift {
   nom String
   prix Decimal
   image String
+  giftCategory  GiftCategory  @default(unclassified)
   isAvailable Boolean @default(true)
 //  message        Message?
+}
+
+enum GiftCategory {
+  rose
+  mode_beaute
+  fitness_bien_etre
+  cuisine_gastronomie
+  bijoux_accessoires
+  art_creativite
+  musique
+  technologie_gadget
+  litterature_ecriture
+  jardinage
+  jeux_loisirs
+  sextoys
+  unclassified
 }
 
 model SocketMapping {

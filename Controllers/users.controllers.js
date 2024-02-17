@@ -171,7 +171,7 @@ module.exports = {
         const { hobbies, description, disponiblePour } = req.body;
 
         if (!req.file) {
-            return res.status(400).json({ error: 'No file uploaded', msg: 'No file uploaded'  });
+            return res.status(400).json({ error: 'No file uploaded', msg: 'No file uploaded' });
         }
 
         const file = req.file;
@@ -1040,6 +1040,94 @@ module.exports = {
                     message: error.message || `Some error occurred while updating the deviceToken with id=${id}`,
                 })
             })
-    }
+    },
+
+    createGift: async (req, res) => {
+        console.log("Creating new gift...");
+        console.log("New gift details:", req.body);
+
+        const { nom, prix, category, isAvailable } = req.body;
+
+        // Handle image upload to S3
+        if (!req.file) {
+            res.status(400).json({ error: 'No file uploaded' });
+        }
+
+        const file = req.file;
+        const { filename, path } = file;
+
+        try {
+            // const randomString = Math.random().toString(36).substring(2, 15) /** + Math.random().toString(36).substring(2, 15)*/;
+            const uploadParams = {
+                Bucket: 'user.toloveapp-storage',
+                Key: `gifts/${filename}`,
+                Body: fs.createReadStream(path),
+                ContentType: file.mimetype,
+            };
+
+            try {
+                const uploadResponse = await myS3Client.send(new PutObjectCommand(uploadParams));
+                console.log(`Successfully uploaded Gift image to S3: ${uploadParams.Key}`);
+            } catch (err) {
+                console.error('Error uploading Gift image to S3:', err);
+                res.status(500).json({ error: 'Error uploading Gift image to S3' });
+            }
+
+            const imageUrl = `https://s3.eu-west-2.amazonaws.com/${uploadParams.Bucket}/${uploadParams.Key}`;
+
+            // Creating the gift in the DB
+            const newGift = await prisma.gift.create({
+                data: {
+                    nom: nom,
+                    prix: parseInt(prix),
+                    image: imageUrl,
+                    giftCategory: category,
+                    isAvailable: isAvailable === 'true' ? true : false,
+                },
+            });
+
+            console.log("Gift successfully created", newGift);
+            res.status(200).json({ success: true, newGift });
+        } catch (error) {
+            console.error('Error creating gift:', error);
+            res.status(500).json({ error: 'Failed to create gift' }); // Internal server error
+        }
+    },
+
+    getGifts: async (req, res) => {
+        console.log("Attempting to fetch gifts...");
+
+        try {
+            const gifts = await prisma.gift.findMany();
+
+            res.status(200).json(gifts);
+        } catch (error) {
+            console.error('Error getting gifts:', error);
+            res.status(500).json({ error: 'Failed to get gifts' });
+        }
+    },
+
+    getGiftsByCategory: async (req, res) => {
+        const { category } = req.params;
+        console.log("Attempting to fetch gifts by category...", category);
+        const page = parseInt(req.query.page) || 1;
+        console.log("Page:", page);
+        const limit = 12;
+
+        try {
+            const gifts = await prisma.gift.findMany({
+                where: {
+                    giftCategory: category,
+                },
+                skip: (page - 1) * limit,
+                take: limit,
+            });
+
+            res.status(200).json(gifts);
+        } catch (error) {
+            console.error('Error fetching gifts by category and page:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    },
 
 }

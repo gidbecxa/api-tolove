@@ -23,6 +23,8 @@ module.exports = (apiRouter) => {
     apiRouter.route('/chatrooms/messages/:chatroomId').get(authMiddleware, usersCtrl.getAllChatroomMessages);
     apiRouter.route('/chatrooms/last-message/:chatroomId').get(authMiddleware, usersCtrl.getLastMessage);
     apiRouter.route('/users/get-profile-photo/:id').get(authMiddleware, usersCtrl.getProfilePhoto);
+    apiRouter.route('/gifts/get-gifts').get(authMiddleware, usersCtrl.getGifts);
+    apiRouter.route('/gifts/get-gifts-by-category/:category').get(authMiddleware, usersCtrl.getGiftsByCategory);
 
     // put routes
     apiRouter.route('/users/update/complementpart1/:id').put(ValidatorMiddlewares(updateProfilePartOneSchema), authMiddleware, usersCtrl.updateProfilPartOne);
@@ -44,4 +46,5 @@ module.exports = (apiRouter) => {
     apiRouter.route('/users/get-locked-user/:id').post(usersCtrl.getLockedUsers);
     apiRouter.route('/users/check-locked').post(authMiddleware, usersCtrl.checkLockedUsers);
     apiRouter.route('/chatrooms/getchatroom/by-participants').post(authMiddleware, usersCtrl.getChatRoomIdForUsers);
+    apiRouter.route('/gifts/create-gift').post(authMiddleware, upload.single('image'), usersCtrl.createGift);
 };
