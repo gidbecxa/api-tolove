@@ -1,0 +1,132 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  username String  @unique
+  email String   @unique
+  password String
+  photoProfil String?
+  birthday DateTime?
+  horoscope String?
+  hobbies Json?
+  langage Json?
+  description String?
+  preference Json?
+  genre Genre?
+  coins Int  @default(0)
+  isCertified Boolean  @default(false)
+  isCompleted Boolean @default(false)
+  isFake Boolean  @default(false)
+  longitude Decimal?
+  latitude Decimal?
+  pays String?
+  villes String?
+  isOnline Boolean  @default(false)
+  role Role @default(USER)
+  deviceToken String?
+  to Match[] @relation("to")
+  from   Match[] @relation("from")
+  toNotified Notification[] @relation("toNotified") 
+  fromNotified   Notification[] @relation("fromNotified")
+}
+
+enum Genre {
+  male
+  female
+  neutre
+}
+
+enum Role {
+  USER
+  ADMIN
+  AGENT
+}
+
+model Match {
+  id     Int    @id @default(autoincrement())
+  from    User @relation("from", fields: [fromId], references: [id])
+  fromId  Int
+  to   User @relation("to", fields: [toId], references: [id])
+  toId Int
+  isConfirm Boolean @default(false)
+  typeMatch TypeMatch  @default(normal)
+}
+
+enum TypeMatch {
+  boost
+  normal
+}
+
+model Notification {
+  id     Int    @id @default(autoincrement())
+  title  String 
+  content String
+  from    User @relation("fromNotified", fields: [fromNotifiedId], references: [id])
+  fromNotifiedId  Int
+  to   User @relation("toNotified", fields: [toNotifiedId], references: [id])
+  toNotifiedId Int
+}
+
+model ChatRoom {
+  id     Int    @id @default(autoincrement())
+  participant Json
+  lastMessage String?
+  lastMessageSender Int?
+  lastMessageStatus LastMessageStatus @default(pending)
+  messages     Message[]
+}
+
+
+enum LastMessageStatus {
+  pending
+  send
+  unsend
+  received
+  read
+}
+
+model Message {
+  id    Int    @id @default(autoincrement())
+  contenu String
+  typeMessage TypeMessage @default(text)
+  sender Int
+  dateMessage DateTime
+  status Status @default(pending)
+  gift   Gift    @relation(fields: [giftId], references: [id])
+  giftId Int    @unique
+  chatRoom   ChatRoom   @relation(fields: [chatId], references: [id])
+  chatId Int
+}
+
+enum TypeMessage {
+  file
+  gift
+  text
+}
+
+enum Status {
+  pending
+  send
+  unsend
+  received
+  read
+}
+
+model Gift {
+  id     Int    @id @default(autoincrement())
+  nom String
+  prix Decimal
+  image String
+  isAvailable Boolean @default(true)
+  message        Message?
+}

@@ -74,7 +74,6 @@ module.exports = {
                     genre: true,
                     photoProfil: true,
                     pays: true,
-                    villes: true
                 },
                 orderBy: {
                     id: 'desc', // Order by the ID in descending order (most recent first)
@@ -169,7 +168,7 @@ module.exports = {
         const { id } = req.params;
         console.log('Update data step 2 for user ', id);
         console.log('Request body ', req.body);
-        const { description } = req.body;
+        const { hobbies, description, disponiblePour } = req.body;
 
         if (!req.file) {
             return res.status(400).json({ error: 'No file uploaded', msg: 'No file uploaded' });
@@ -205,7 +204,10 @@ module.exports = {
                 where: { id: parseInt(id) },
                 data: {
                     photoProfil: imageUrl,
+                    // hobbies: hobbies,
                     description: description,
+                    // preferencePays: preferencePays,
+                    disponiblePour: disponiblePour
                 },
             });
 
@@ -483,7 +485,7 @@ module.exports = {
 
     getPhotoWithUrl: async (req, res) => {
         const { photoURL } = req.body;
-        // console.log('URL for presignedURL: ', photoURL);
+        console.log('URL for presignedURL: ', photoURL);
 
         const objectParams = {
             Bucket: 'user.toloveapp-storage',

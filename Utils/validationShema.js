@@ -70,3 +70,92 @@ exports.agentUserSchema = yup.object({
     pays: yup.string().required('Pays is required'),
     villes: yup.string().required('Villes is required'),
 });
+
+
+// COUNTRY VALIDATION SCHEMAS
+
+exports.addCountrySchema = yup.object({
+    name: yup.string().required(errorTypeOne)
+});
+
+exports.updateCountrySchema = yup.object({
+    name: yup.string().required(errorTypeOne)
+});
+
+exports.deleteCountrySchema = yup.object({
+    id: yup.string().required('ID is required')
+});
+
+// CITY VALIDATION SCHEMAS
+
+exports.addCitySchema = yup.object({
+    name: yup.string().required(errorTypeOne)
+});
+
+exports.updateCitySchema = yup.object({
+    name: yup.string().required(errorTypeOne)
+});
+
+exports.deleteCitySchema = yup.object({
+    id: yup.string().required('ID is required')
+});
+
+// RESTO VALIDATION SCHEMAS
+exports.addRestoSchema = yup.object({
+    name: yup.string().required('Name is required'),
+    OpenDaysTime: yup.string().required('Open Days and Times are required'),
+    countryId: yup.string().required('Country is required'),
+    cityId: yup.string().required('City is required'),
+    image: yup.string().required('Image is required'),
+});
+
+exports.updateRestoSchema = yup.object({
+    name: yup.string().required('Name is required'),
+    OpenDaysTime: yup.string().required('Open Days and Times are required'),
+    countryId: yup.string().required('Country is required'),
+    cityId: yup.string().required('City is required'),
+    image: yup.string().required('Image is required'),
+});
+
+exports.deleteRestoSchema = yup.object({
+    id: yup.string().required('ID is required')
+});
+
+exports.likeRestoSchema = yup.object({
+    userId: yup.string().required('User ID is required'),
+    restoId: yup.string().required('Resto ID is required'),
+});
+
+exports.unLikeRestoSchema = yup.object({
+    userId: yup.string().required('User ID is required'),
+    restoId: yup.string().required('Resto ID is required'),
+});
+
+// HOSTEL VALIDATION SCHEMAS
+exports.addHostelSchema = yup.object({
+    name: yup.string().required('Name is required'),
+    countryId: yup.string().required('Country is required'),
+    cityId: yup.string().required('City is required'),
+    image: yup.string().required('Image is required'),
+});
+
+exports.updateHostelSchema = yup.object({
+    name: yup.string().required('Name is required'),
+    countryId: yup.string().required('Country is required'),
+    cityId: yup.string().required('City is required'),
+    image: yup.string().required('Image is required'),
+});
+
+exports.deleteHostelSchema = yup.object({
+    id: yup.string().required('ID is required')
+});
+
+exports.likeHostelSchema = yup.object({
+    userId: yup.string().required('User ID is required'),
+    restoId: yup.string().required('Hostel ID is required'),
+});
+
+exports.unLikeHostelSchema = yup.object({
+    userId: yup.string().required('User ID is required'),
+    restoId: yup.string().required('Hostel ID is required'),
+});

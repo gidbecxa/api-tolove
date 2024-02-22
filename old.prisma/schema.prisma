@@ -3,10 +3,11 @@
 
 generator client {
   provider = "prisma-client-js"
+  binaryTargets = ["native"]
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -48,11 +49,6 @@ model User {
   socketMapping SocketMapping?
   initiatedLock LockedConversation[] @relation("initiatedLocks")
   receivedLock LockedConversation[] @relation("receivedLocks")
-  podiumUsers Podium[]
-  restoLikes LikedResto[]
-  hostelLikes LikedHostel[]
-  restoReservations RestoReservation[]
-  hostelReservations HostelReservation[]
 }
 
 enum Genre {
@@ -184,123 +180,4 @@ model LockedConversation {
   receiverId Int
 
   @@unique([initiatorId, receiverId])
-}
-
-enum PodiumStatus {
-  NONE
-  COUNTRY
-  WORLD
-}
-
-model Podium {
-  id         Int              @id @default(autoincrement())
-  userId     Int              @unique
-  status     PodiumStatus     @default(NONE)
-  createdAt  DateTime         @default(now())
-
-  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Country {
-  id         Int              @id @default(autoincrement())
-  name       String           @unique
-  sigle      String           @unique 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  restos Resto[]
-  hostels Hostel[]
-}
-
-model City {
-  id         Int              @id @default(autoincrement())
-  name       String           @unique
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  restos Resto[]
-  hostels Hostel[]
-}
-
-model Resto {
-  id              Int              @id @default(autoincrement())
-  name            String
-  description     String?
-  location        String?
-  OpenDaysTime    Json
-  countryId       Int
-  cityId          Int
-  image           String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
-  country         Country             @relation(fields: [countryId], references: [id])
-  city            City                @relation(fields: [cityId], references: [id])
-  likes           LikedResto[]
-  reservations    RestoReservation[]
-}
-
-model Hostel {
-  id              Int              @id @default(autoincrement())
-  name            String
-  description     String?
-  location        String?
-  countryId       Int
-  cityId          Int
-  image           String
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-
-  country         Country          @relation(fields: [countryId], references: [id])
-  city            City             @relation(fields: [cityId], references: [id])
-  likes           LikedHostel[]
-  reservations    HostelReservation[]
-}
-
-model LikedResto {
-  id              Int              @id @default(autoincrement())
-  userId          Int              
-  restoId         Int              
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-
-  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  resto           Resto            @relation(fields: [restoId], references: [id], onDelete: Cascade)
-}
-
-model LikedHostel {
-  id              Int              @id @default(autoincrement())
-  userId          Int              
-  hostelId        Int              
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-
-  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  hostel          Hostel           @relation(fields: [hostelId], references: [id], onDelete: Cascade)
-}
-
-model RestoReservation {
-  id              Int              @id @default(autoincrement())
-  userId          Int
-  restoId         Int   
-  startDate       DateTime
-  endDate         DateTime
-  totalPrice      Int?
-  createdAt       DateTime @default(now())
-
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  resto           Resto   @relation(fields: [restoId], references: [id], onDelete: Cascade)
-}
-
-model HostelReservation {
-  id              Int              @id @default(autoincrement())
-  userId          Int
-  hostelId        Int   
-  startDate       DateTime
-  endDate         DateTime
-  totalPrice      Int?
-  createdAt       DateTime @default(now())
-
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  hostel          Hostel   @relation(fields: [hostelId], references: [id], onDelete: Cascade)
 }

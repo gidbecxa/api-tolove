@@ -54,6 +54,7 @@ module.exports = {
     register: async function (req, res) {
         const { pays, phoneNumber } = req.body;
         // let verificationRequest;
+        console.log("Registering a user, phone number:", phoneNumber);
 
         try {
             const response = await prisma.user.findMany({
