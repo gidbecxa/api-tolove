@@ -46,6 +46,13 @@ const setupSocketIO = (server) => {
                 },
             });
             console.log("Match sent:", sentMatch);
+
+            // Emit the message to the recipient's socket
+            const recipientSocketId = userSockets.get(targetUserId);
+            if (recipientSocketId) {
+                io.to(recipientSocketId).emit('matchReceived', sentMatch);
+                console.log("Match emitted to target");
+            }
         });
 
         socket.on('confirmMatch', async (matchId, senderUserId) => {
@@ -356,6 +363,9 @@ const setupSocketIO = (server) => {
                 console.error('Error occurred while storing users in LockedConversation:', error)
             }
 
+            // Send an event to update recent messages list
+            io.emit('updateChatroom', chatroomId);
+
         });
 
         socket.on('unlockChat', async (recipientUserId, senderUserId, chatroomId) => {
@@ -413,6 +423,9 @@ const setupSocketIO = (server) => {
             } catch (error) {
                 console.error('Error occured while deleting users\'s LockedConversation row', error);
             }
+
+            // Send an event to update recent messages list
+            io.emit('updateChatroom', chatroomId);
         });
 
         socket.on('responseMessageRead', async (messageId) => {
