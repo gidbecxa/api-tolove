@@ -1,3 +1,0 @@
--- AlterTable
-ALTER TABLE `ChatRoom` ADD COLUMN `agentId` INTEGER NULL,
-    ADD COLUMN `isSentByAgent` BOOLEAN NOT NULL DEFAULT false;
