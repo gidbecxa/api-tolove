@@ -180,7 +180,7 @@ module.exports = {
 
         try {
             const uploadParams = {
-                Bucket: 'user.toloveapp-storage',
+                Bucket: 'user.dmvision-bucket',
                 Key: `user${id}/${filename}`,
                 Body: fs.createReadStream(path),
                 ContentType: file.mimetype
@@ -386,8 +386,8 @@ module.exports = {
 
         const photoProfilUrl = user.photoProfil;
         const params = {
-            Bucket: 'user.toloveapp-storage',
-            Key: photoProfilUrl.replace(`https://s3.eu-west-2.amazonaws.com/user.toloveapp-storage/`, ''),
+            Bucket: 'user.dmvision-bucket',
+            Key: photoProfilUrl.replace(`https://s3.eu-west-2.amazonaws.com/user.dmvision-bucket/`, ''),
         };
 
         try {
@@ -452,8 +452,8 @@ module.exports = {
             const photoProfilUrl = user.photoProfil;
 
             const objectParams = {
-                Bucket: 'user.toloveapp-storage',
-                Key: photoProfilUrl.replace(`https://s3.eu-west-2.amazonaws.com/user.toloveapp-storage/`, ''),
+                Bucket: 'user.dmvision-bucket',
+                Key: photoProfilUrl.replace(`https://s3.eu-west-2.amazonaws.com/user.dmvision-bucket/`, ''),
             }
             // console.log(objectParams);
 
@@ -486,8 +486,8 @@ module.exports = {
         // console.log('URL for presignedURL: ', photoURL);
 
         const objectParams = {
-            Bucket: 'user.toloveapp-storage',
-            Key: photoURL.replace(`https://s3.eu-west-2.amazonaws.com/user.toloveapp-storage/`, ''),
+            Bucket: 'user.dmvision-bucket',
+            Key: photoURL.replace(`https://s3.eu-west-2.amazonaws.com/user.dmvision-bucket/`, ''),
         }
 
         const expirationTime = 60 * 60 * 12;
@@ -744,7 +744,7 @@ module.exports = {
         const { filename, path } = file;
 
         const uploadParams = {
-            Bucket: 'user.toloveapp-storage',
+            Bucket: 'user.dmvision-bucket',
             Key: `user${id}/${filename}`,
             // Key: `users0723/${filename}`,
             Body: fs.createReadStream(path),
@@ -786,7 +786,7 @@ module.exports = {
         const { filename, path } = file;
 
         const uploadParams = {
-            Bucket: 'user.toloveapp-storage',
+            Bucket: 'user.dmvision-bucket',
             Key: `user${id}/${filename}`,
             // Key: `users0723/${filename}`,
             Body: fs.createReadStream(path),
@@ -1057,7 +1057,7 @@ module.exports = {
         try {
             // const randomString = Math.random().toString(36).substring(2, 15) /** + Math.random().toString(36).substring(2, 15)*/;
             const uploadParams = {
-                Bucket: 'user.toloveapp-storage',
+                Bucket: 'cadeau.dmvision-bucket',
                 Key: `gifts/${filename}`,
                 Body: fs.createReadStream(path),
                 ContentType: file.mimetype,

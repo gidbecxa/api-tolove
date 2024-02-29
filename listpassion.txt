@@ -1,3 +1,0 @@
-[
-    "Football", "Basketball", "Tennis", "Handball", "Volleyball", "Padel", "Rugby", "Baseball", "Cyclisme", "Cuisine", "Jardinage", "Randonnée", "La pêche", "Musique", "Musculation", "Danse", "Camping", "Photographie", "La Bourse", "Méditation", "Technologie", "Livres", "Politique", "Économie", "Diplomatie", "Mode", "Concert", "Voyage", "Bijoux", "Gaming", "Jardinage", "Commerce", "Bricolage", "Langue", "Shopping", "Serie", "Film", "Documentaire", "Thé", "Spiritualité", "Comédie", "Astrologie", "Beer", "Vin, "Cigarette", "Automobile", "Crypto", "Surf", "Tatouage", "Informatique"
-]
