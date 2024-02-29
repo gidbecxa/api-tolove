@@ -89,7 +89,7 @@ module.exports = {
 
     createUserByAgent: async function (req, res) {
         // console.log("Request body:", req.body);
-        const { username, pays, phoneNumber, birthday, description, preference, genre, hobbies, ville, preferencePays, disponiblePour } = req.body;
+        const { username, pays, phoneNumber, birthday, description, preference, genre, hobbies, ville, preferencePays } = req.body;
         const birthdayFormatted = new Date(birthday);
         console.log("Attempting to create user:", { username, pays, phoneNumber, birthdayFormatted, description, preference, genre, hobbies, ville, preferencePays, disponiblePour });
         const { agentId } = req.params;
@@ -153,7 +153,7 @@ module.exports = {
                     villes: ville,
                     assignedAgent: parseInt(agentId),
                     preferencePays: preferencePays,
-                    disponiblePour: disponiblePour
+                    // disponiblePour: disponiblePour
                 },
             });
 
