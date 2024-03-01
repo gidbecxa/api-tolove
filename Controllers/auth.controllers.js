@@ -91,7 +91,7 @@ module.exports = {
         // console.log("Request body:", req.body);
         const { username, pays, phoneNumber, birthday, description, preference, genre, hobbies, ville, preferencePays } = req.body;
         const birthdayFormatted = new Date(birthday);
-        console.log("Attempting to create user:", { username, pays, phoneNumber, birthdayFormatted, description, preference, genre, hobbies, ville, preferencePays, disponiblePour });
+        console.log("Attempting to create user:", { username, pays, phoneNumber, birthdayFormatted, description, preference, genre, hobbies, ville, preferencePays });
         const { agentId } = req.params;
         console.log("Attempting to create user for agent:", { agentId });
 
