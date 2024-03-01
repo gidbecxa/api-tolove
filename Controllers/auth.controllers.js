@@ -14,7 +14,7 @@ const prisma = new PrismaClient();
 
 module.exports = {
 
-    /* register: async function (req, res) {
+    register: async function (req, res) {
         const { pays, phoneNumber } = req.body;
         let verificationRequest;
 
@@ -34,8 +34,8 @@ module.exports = {
             } else {
                 verificationRequest = await twilio.verify.v2.services(VERIFICATION_SID)
                     .verifications
-                    .create({ to: phoneNumber, channel: 'sms' });
-                // .then(verification => console.log('sid:', verification.sid));
+                    .create({ to: phoneNumber, channel: 'sms' })
+                    .then(verification => console.log('sid:', verification.sid));
 
                 res.status(201).send({
                     success: true,
@@ -49,9 +49,9 @@ module.exports = {
         }
 
         logger.debug(verificationRequest);
-    }, */
+    },
 
-    register: async function (req, res) {
+    /* register: async function (req, res) {
         const { pays, phoneNumber } = req.body;
         // let verificationRequest;
 
@@ -69,10 +69,6 @@ module.exports = {
             if (response.length > 0) {
                 return res.status(422).send({ success: false, msg: 'This phone number is already in use' });
             } else {
-                /* verificationRequest = await twilio.verify.v2.services(VERIFICATION_SID)
-                    .verifications
-                    .create({ to: phoneNumber, channel: 'sms' }); */
-
                 res.status(201).send({
                     success: true,
                     code: '001089',
@@ -84,14 +80,13 @@ module.exports = {
             return res.status(500).send(error);
         }
 
-        // logger.debug(verificationRequest);
-    },
+    }, */
 
     createUserByAgent: async function (req, res) {
         // console.log("Request body:", req.body);
-        const { username, pays, phoneNumber, birthday, description, preference, genre, hobbies, ville, preferencePays } = req.body;
+        const { username, pays, phoneNumber, birthday, description, preference, genre, hobbies, ville } = req.body;
         const birthdayFormatted = new Date(birthday);
-        console.log("Attempting to create user:", { username, pays, phoneNumber, birthdayFormatted, description, preference, genre, hobbies, ville, preferencePays, disponiblePour });
+        console.log("Attempting to create user:", { username, pays, phoneNumber, birthdayFormatted, description, preference, genre, hobbies, ville });
         const { agentId } = req.params;
         console.log("Attempting to create user for agent:", { agentId });
 
@@ -114,7 +109,7 @@ module.exports = {
             }
 
             const uploadParams = {
-                Bucket: 'user.dmvision-bucket',
+                Bucket: 'user.toloveapp-storage',
                 Key: `user${agentId}/${filename}`,
                 Body: fs.createReadStream(path),
                 ContentType: file.mimetype
@@ -152,8 +147,7 @@ module.exports = {
                     pays: pays,
                     villes: ville,
                     assignedAgent: parseInt(agentId),
-                    preferencePays: preferencePays,
-                    // disponiblePour: disponiblePour
+                    // preferencePays: preferencePays,
                 },
             });
 
@@ -164,7 +158,7 @@ module.exports = {
         }
     },
 
-    /* verify: async function (req, res) {
+    verify: async function (req, res) {
         // const { verificationCode: code } = req.body;
         const { code, phoneNumber, pays } = req.body;
         console.log(code, pays, phoneNumber);
@@ -214,23 +208,12 @@ module.exports = {
             }
         }
         // errors.verificationCode = `Unable to verify code. status: ${verificationResult.status}`;
-    }, */
+    },
 
-    verify: async function (req, res) {
+    /* verify: async function (req, res) {
         // const { verificationCode: code } = req.body;
-        const { code, phoneNumber, pays } = req.body;
+        const { code, phoneNumber, pays, username } = req.body;
         console.log(code, pays, phoneNumber);
-
-        /* try {
-            verificationResult = await twilio.verify.v2.services(VERIFICATION_SID)
-                .verificationChecks
-                .create({ to: phoneNumber, code: code })
-        } catch (error) {
-            logger.error(error);
-            return res.status(500).send(error);
-        } */
-
-        // logger.debug(verificationResult);
 
         if (code === '001089') {
             console.log('Attempting to create user...');
@@ -262,7 +245,7 @@ module.exports = {
                 });
             }
         }
-    },
+    }, */
 
     login: async function (req, res) {
 
