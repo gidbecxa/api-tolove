@@ -16,7 +16,7 @@ module.exports = {
 
     registerWithTwilio: async function (req, res) {
         const { pays, phoneNumber } = req.body;
-	console.log("Attempting to create a user:", phoneNumber);
+	console.log("Attempting to verify user:", phoneNumber);
         let verificationRequest;
 
         try {
@@ -38,7 +38,7 @@ module.exports = {
                 verificationRequest = await twilio.verify.v2.services(VERIFICATION_SID)
                     .verifications
                     .create({ to: phoneNumber, channel: 'sms' })
-                    .then(verification => console.log('sid:', verification.sid));
+                    .then(verification => console.log('Verification data:', verification));
 
                 res.status(201).send({
                     success: true,
@@ -173,7 +173,7 @@ module.exports = {
             verificationResult = await twilio.verify.v2.services(VERIFICATION_SID)
                 .verificationChecks
                 .create({ to: phoneNumber, code: code })
-		.then(verification => console.log(verification.sid));
+		.then(verification_check => console.log('Verification result data', verification_check));
         } catch (error) {
             logger.error(error);
             return res.status(500).send(error);
@@ -181,7 +181,7 @@ module.exports = {
 
         logger.debug(verificationResult);
 
-        if (verificationResult.status === 'approved') {
+        if (verificationResult && verificationResult.status === 'approved') {
             console.log('Attempting to create user...');
             try {
                 const user = await prisma.user.create({
