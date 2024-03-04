@@ -14,8 +14,9 @@ const prisma = new PrismaClient();
 
 module.exports = {
 
-    register: async function (req, res) {
+    registerWithTwilio: async function (req, res) {
         const { pays, phoneNumber } = req.body;
+	console.log("Attempting to create a user:", phoneNumber);
         let verificationRequest;
 
         try {
@@ -32,6 +33,8 @@ module.exports = {
             if (response.length > 0) {
                 return res.status(422).send({ success: false, msg: 'This phone number is already in use' });
             } else {
+		console.log('User phone number is not yet in use!');
+
                 verificationRequest = await twilio.verify.v2.services(VERIFICATION_SID)
                     .verifications
                     .create({ to: phoneNumber, channel: 'sms' })
@@ -51,7 +54,7 @@ module.exports = {
         logger.debug(verificationRequest);
     },
 
-    /* register: async function (req, res) {
+    register: async function (req, res) {
         const { pays, phoneNumber } = req.body;
         // let verificationRequest;
 
@@ -80,7 +83,7 @@ module.exports = {
             return res.status(500).send(error);
         }
 
-    }, */
+    },
 
     createUserByAgent: async function (req, res) {
         // console.log("Request body:", req.body);
@@ -158,7 +161,7 @@ module.exports = {
         }
     },
 
-    verify: async function (req, res) {
+    verifyViaTwilio: async function (req, res) {
         // const { verificationCode: code } = req.body;
         const { code, phoneNumber, pays } = req.body;
         console.log(code, pays, phoneNumber);
@@ -170,6 +173,7 @@ module.exports = {
             verificationResult = await twilio.verify.v2.services(VERIFICATION_SID)
                 .verificationChecks
                 .create({ to: phoneNumber, code: code })
+		.then(verification => console.log(verification.sid));
         } catch (error) {
             logger.error(error);
             return res.status(500).send(error);
@@ -210,7 +214,7 @@ module.exports = {
         // errors.verificationCode = `Unable to verify code. status: ${verificationResult.status}`;
     },
 
-    /* verify: async function (req, res) {
+    verify: async function (req, res) {
         // const { verificationCode: code } = req.body;
         const { code, phoneNumber, pays, username } = req.body;
         console.log(code, pays, phoneNumber);
@@ -245,7 +249,7 @@ module.exports = {
                 });
             }
         }
-    }, */
+    },
 
     login: async function (req, res) {
 
