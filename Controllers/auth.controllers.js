@@ -38,7 +38,7 @@ module.exports = {
                 verificationRequest = await twilio.verify.v2.services(VERIFICATION_SID)
                     .verifications
                     .create({ to: phoneNumber, channel: 'sms' })
-                    .then(verification => console.log('Verification data:', verification));
+                    // .then(verification => console.log('Verification data:', verification));
 
                 res.status(201).send({
                     success: true,
@@ -173,7 +173,7 @@ module.exports = {
             verificationResult = await twilio.verify.v2.services(VERIFICATION_SID)
                 .verificationChecks
                 .create({ to: phoneNumber, code: code })
-                .then(verification_check => console.log('Verification result data', verification_check));
+                // .then(verification_check => console.log('Verification result data', verification_check));
 
             if (verificationResult && verificationResult.status === 'approved') {
                 console.log('Verification approved. Attempting to create user...');
