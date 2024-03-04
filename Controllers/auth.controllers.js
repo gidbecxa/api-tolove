@@ -16,7 +16,7 @@ module.exports = {
 
     registerWithTwilio: async function (req, res) {
         const { pays, phoneNumber } = req.body;
-	console.log("Attempting to verify user:", phoneNumber);
+        console.log("Attempting to verify user:", phoneNumber);
         let verificationRequest;
 
         try {
@@ -33,7 +33,7 @@ module.exports = {
             if (response.length > 0) {
                 return res.status(422).send({ success: false, msg: 'This phone number is already in use' });
             } else {
-		console.log('User phone number is not yet in use!');
+                console.log('User phone number is not yet in use!');
 
                 verificationRequest = await twilio.verify.v2.services(VERIFICATION_SID)
                     .verifications
@@ -173,7 +173,45 @@ module.exports = {
             verificationResult = await twilio.verify.v2.services(VERIFICATION_SID)
                 .verificationChecks
                 .create({ to: phoneNumber, code: code })
-		.then(verification_check => console.log('Verification result data', verification_check));
+                .then(verification_check => console.log('Verification result data', verification_check));
+
+            if (verificationResult && verificationResult.status === 'approved') {
+                console.log('Verification approved. Attempting to create user...');
+
+                try {
+                    const user = await prisma.user.create({
+                        data: {
+                            phoneNumber: phoneNumber,
+                            pays: pays,
+                        },
+                    });
+
+                    const userId = user.id;
+                    const accessToken = jwtUtils.generateTokenForUser(user);
+                    const refreshToken = jwtUtils.generateRefreshTokenForUser(user);
+
+                    res.status(201).send({
+                        success: true,
+                        msg: 'User was created successfully',
+                        data: {
+                            'userId': userId,
+                            'access_token': accessToken,
+                            'refresh_token': refreshToken,
+                        },
+                    });
+                } catch (error) {
+                    res.status(500).send({
+                        success: false,
+                        msg: error.message || 'Some error occurred while creating the user',
+                    });
+                }
+            } else {
+                console.log('Verification not approved.');
+                res.status(422).send({
+                    success: false,
+                    msg: 'Verification failed. Please check the verification code.',
+                });
+            }
         } catch (error) {
             logger.error(error);
             return res.status(500).send(error);
@@ -181,36 +219,7 @@ module.exports = {
 
         logger.debug(verificationResult);
 
-        if (verificationResult && verificationResult.status === 'approved') {
-            console.log('Attempting to create user...');
-            try {
-                const user = await prisma.user.create({
-                    data: {
-                        phoneNumber: phoneNumber,
-                        pays: pays,
-                    },
-                });
 
-                const userId = user.id;
-                const accessToken = jwtUtils.generateTokenForUser(user);
-                const refreshToken = jwtUtils.generateRefreshTokenForUser(user);
-
-                res.status(201).send({
-                    success: true,
-                    msg: 'User was created successfully',
-                    data: {
-                        'userId': userId,
-                        'access_token': accessToken,
-                        'refresh_token': refreshToken,
-                    },
-                });
-            } catch (error) {
-                res.status(500).send({
-                    success: false,
-                    msg: error.message || 'Some error occurred while creating the user',
-                });
-            }
-        }
         // errors.verificationCode = `Unable to verify code. status: ${verificationResult.status}`;
     },
 
