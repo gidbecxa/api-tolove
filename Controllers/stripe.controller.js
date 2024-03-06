@@ -85,23 +85,29 @@ module.exports = {
 
         try {
             let amount = 0;
+	    let coins = 0;
 
             // set the amount based on the price of the pack
             switch (packIndex) {
                 case 1:
-                    amount = 149;
+                    amount = 99;
+		    coins = 10;
                     break;
                 case 2:
-                    amount = 2999;
+                    amount = 1500;
+		    coins = 15;
                     break;
                 case 3:
-                    amount = 4999;
+                    amount = 5000;
+		    coins = 50;
                     break;
                 case 4:
-                    amount = 9999;
+                    amount = 10000;
+		    coins = 100;
                     break;
                 case 5:
-                    amount = 24999;
+                    amount = 25000;
+		    coins = 250;
                     break;
                 default:
                     break;
