@@ -84,6 +84,7 @@ module.exports = {
         }
 
     },
+
     createUserByAgent: async function (req, res) {
         // console.log("Request body:", req.body);
         const { username, pays, phoneNumber, birthday, description, preference, genre, hobbies, ville } = req.body;
@@ -150,6 +151,43 @@ module.exports = {
                     villes: ville,
                     assignedAgent: parseInt(agentId),
                     // preferencePays: preferencePays,
+                },
+            });
+
+            return res.status(201).send({ success: true, msg: 'User was created successfully', user: newUser });
+        } catch (error) {
+            console.error('Error creating user:', error);
+            res.status(500).json({ success: false, error: "Failed to create user" });
+        }
+    },
+
+    createAgent: async function (req, res) {
+        console.log("Request body for mod creation:", req.body);
+        const { data } = req.body;
+        console.log("Attempting to create user:", { data });
+
+        const { agentId } = req.params;
+        console.log("Attempting to create user for agent:", { agentId });
+
+        try {
+            const existingUser = await prisma.user.findFirst({
+                where: {
+                    phoneNumber: phoneNumber,
+                },
+            });
+
+            if (existingUser) {
+                return res.status(422).send({ success: false, msg: 'User with this phone number exists already' });
+            }
+
+            // Create a new user in the database
+            const newUser = await prisma.user.create({
+                data: {
+                    phoneNumber: data.phoneNumber,
+                    username: data.username,
+                    pays: data.pays,
+                    role: 'AGENT',
+                    // assignedAgent: parseInt(agentId),
                 },
             });
 
