@@ -84,12 +84,11 @@ module.exports = {
         }
 
     },
-
     createUserByAgent: async function (req, res) {
         // console.log("Request body:", req.body);
         const { username, pays, phoneNumber, birthday, description, preference, genre, hobbies, ville } = req.body;
-        const birthdayFormatted = new Date(birthday);
-        console.log("Attempting to create user:", { username, pays, phoneNumber, birthdayFormatted, description, preference, genre, hobbies, ville });
+        // const birthdayFormatted = new Date(birthday).toISOString().slice(0, 19).replace('T', ' ');
+        console.log("Attempting to create user:", { username, pays, phoneNumber, birthday, description, preference, genre, hobbies, ville });
         const { agentId } = req.params;
         console.log("Attempting to create user for agent:", { agentId });
 
@@ -112,7 +111,7 @@ module.exports = {
             }
 
             const uploadParams = {
-                Bucket: 'user.toloveapp-storage',
+                Bucket: 'user.dmvision-bucket',
                 Key: `user${agentId}/${filename}`,
                 Body: fs.createReadStream(path),
                 ContentType: file.mimetype
@@ -139,7 +138,7 @@ module.exports = {
                     phoneNumber: phoneNumber,
                     username: username,
                     photoProfil: imageUrl,
-                    birthday: birthdayFormatted,
+                    birthday: birthday,
                     hobbies: hobbies,
                     description: description,
                     preference: preference,

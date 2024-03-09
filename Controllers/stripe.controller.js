@@ -93,7 +93,7 @@ module.exports = {
             // set the amount based on the price of the pack
             switch (packIndex) {
                 case 1:
-                    amount = 9;
+                    amount = 1000;
                     coins = 10;
                     break;
                 case 2:

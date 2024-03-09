@@ -483,11 +483,14 @@ module.exports = {
 
     getPhotoWithUrl: async (req, res) => {
         const { photoURL } = req.body;
-        // console.log('URL for presignedURL: ', photoURL);
+        console.log('URL for presignedURL: ', photoURL);
+
+        // Determine the bucket dynamically
+        const bucketPrefix = photoURL.includes('cadeau.dmvision-bucket') ? 'cadeau.dmvision-bucket' : 'user.dmvision-bucket';
 
         const objectParams = {
-            Bucket: 'user.dmvision-bucket',
-            Key: photoURL.replace(`https://s3.eu-west-2.amazonaws.com/user.dmvision-bucket/`, ''),
+            Bucket: bucketPrefix,
+            Key: photoURL.replace(`https://s3.eu-west-2.amazonaws.com/${bucketPrefix}/`, ''),
         }
 
         const expirationTime = 60 * 60 * 12;

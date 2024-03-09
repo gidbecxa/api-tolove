@@ -23,7 +23,7 @@ model User {
   description String?
   preference Json?
   genre Genre?
-  coins Int  @default(0)
+  coins Float  @default(0)
   isCertified Boolean  @default(false)
   isCompleted Boolean @default(false)
   isFake Boolean  @default(false)
