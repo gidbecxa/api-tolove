@@ -163,8 +163,8 @@ module.exports = {
 
     createAgent: async function (req, res) {
         console.log("Request body for mod creation:", req.body);
-        const { data } = req.body;
-        console.log("Attempting to create user:", { data });
+        const { pays, phoneNumber, username } = req.body;
+        // console.log("Attempting to create user:", { data });
 
         const { agentId } = req.params;
         console.log("Attempting to create user for agent:", { agentId });
@@ -183,9 +183,9 @@ module.exports = {
             // Create a new user in the database
             const newUser = await prisma.user.create({
                 data: {
-                    phoneNumber: data.phoneNumber,
-                    username: data.username,
-                    pays: data.pays,
+                    phoneNumber: phoneNumber,
+                    username: username,
+                    pays: pays,
                     role: 'AGENT',
                     // assignedAgent: parseInt(agentId),
                 },
