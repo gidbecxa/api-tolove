@@ -95,20 +95,40 @@ const setupSocketIO = (server) => {
                     // Chatroom already exists
                     chatroomId = existingChatroom.id;
                 } else {
-                    // Create a new chatroom
-                    const participant = [senderUserId, recipientUserId];
-
-                    // Create a new chatroom in the database
-                    const createdChatroom = await prisma.chatRoom.create({
-                        data: {
-                            participant: participant,
-                        },
+                    // Check if recipientUserId has an assigned agent
+                    const recipientUser = await prisma.user.findUnique({
+                        where: { id: recipientUserId },
+                        select: { assignedAgent: true },
                     });
 
-                    console.log('New chatroom created:', createdChatroom);
-                    chatroomId = createdChatroom.id;
+                    const participant = [senderUserId, recipientUserId];
+
+                    if (recipientUser && recipientUser.assignedAgent !== null) {
+                        // Create a new chatroom with agent information
+                        const createdChatroom = await prisma.chatRoom.create({
+                            data: {
+                                participant: participant,
+                                isSentByAgent: true,
+                                agentId: recipientUser.assignedAgent,
+                            },
+                        });
+
+                        console.log('New chatroom created with agent:', createdChatroom);
+                        chatroomId = createdChatroom.id;
+                    } else {
+                        // Create a new chatroom without agent information
+                        const createdChatroom = await prisma.chatRoom.create({
+                            data: {
+                                participant: participant,
+                            },
+                        });
+
+                        console.log('New chatroom created without agent:', createdChatroom);
+                        chatroomId = createdChatroom.id;
+                    }
                 }
             }
+
 
             // Store the message in the database before emitting to the user
             let storedMessage;
