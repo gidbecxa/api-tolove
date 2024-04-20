@@ -143,7 +143,7 @@ module.exports = {
         const { id } = req.params;
         // console.log('id: ', id);
         const { username, genre, preference, preferencePays, birthday, ville } = req.body;
-        // console.log('Request body ', req.body);
+        console.log('Request body ', req.body);
 
         try {
             const user = await prisma.user.update({
