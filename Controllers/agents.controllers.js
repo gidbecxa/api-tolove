@@ -51,6 +51,7 @@ module.exports = {
     },
 
     getNonCertifiedUsers: async (req, res) => {
+        console.log(`Query: limit: ${req.query.limit}, page: ${req.query.page}`);
         const limit = parseInt(req.query.limit) || 11;
         const page = parseInt(req.query.page) || 0;
 
