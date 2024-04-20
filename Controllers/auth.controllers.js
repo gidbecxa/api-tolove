@@ -86,9 +86,10 @@ module.exports = {
     },
 
     createUserByAgent: async function (req, res) {
-        // console.log("Request body:", req.body);
+        console.log("Request body:", req.body);
         const { username, pays, phoneNumber, birthday, description, preference, genre, hobbies, ville } = req.body;
         // const birthdayFormatted = new Date(birthday).toISOString().slice(0, 19).replace('T', ' ');
+        const birthdayFormatted = new Date(birthday).toISOString().slice(0, 10) + 'T23:00:00.000Z';
         console.log("Attempting to create user:", { username, pays, phoneNumber, birthday, description, preference, genre, hobbies, ville });
         const { agentId } = req.params;
         console.log("Attempting to create user for agent:", { agentId });
@@ -139,7 +140,7 @@ module.exports = {
                     phoneNumber: phoneNumber,
                     username: username,
                     photoProfil: imageUrl,
-                    birthday: birthday,
+                    birthday: birthdayFormatted,
                     hobbies: hobbies,
                     description: description,
                     preference: preference,
@@ -257,6 +258,58 @@ module.exports = {
         logger.debug(verificationResult);
 
 
+        // errors.verificationCode = `Unable to verify code. status: ${verificationResult.status}`;
+    },
+
+    verifyCompany: async function (req, res) {
+        // const { verificationCode: code } = req.body;
+        const { code, phoneNumber, pays } = req.body;
+        console.log(code, pays, phoneNumber);
+
+        let verificationResult;
+        const errors = { wasValidated: true };
+
+        try {
+            verificationResult = await twilio.verify.v2.services(VERIFICATION_SID)
+                .verificationChecks
+                .create({ to: phoneNumber, code: code })
+        } catch (error) {
+            logger.error(error);
+            return res.status(500).send(error);
+        }
+
+        logger.debug(verificationResult);
+
+        if (verificationResult.status === 'approved') {
+            console.log('Attempting to create user...');
+            try {
+                const company = await prisma.company.create({
+                    data: {
+                        phoneNumber: phoneNumber,
+                        country: pays,
+                    },
+                });
+
+                const companyId = company.id;
+                const accessToken = jwtUtils.generateTokenForUser(user);
+                const refreshToken = jwtUtils.generateRefreshTokenForUser(user);
+
+                res.status(201).send({
+                    success: true,
+                    msg: 'User was created successfully',
+                    data: {
+                        'companyId': companyId,
+                        'access_token': accessToken,
+                        'refresh_token': refreshToken,
+                    },
+                });
+            } catch (error) {
+                res.status(500).send({
+                    success: false,
+                    msg: error.message || 'Some error occurred while creating the user',
+                });
+            }
+        }
         // errors.verificationCode = `Unable to verify code. status: ${verificationResult.status}`;
     },
 
