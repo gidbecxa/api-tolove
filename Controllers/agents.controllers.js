@@ -58,6 +58,10 @@ module.exports = {
             const totalRows = await prisma.user.count({
                 where: {
                     isCertified: false,
+                    NOT: [
+                        { photoProfil: null },
+                        { description: null }
+                    ]
                 },
             });
 
@@ -66,6 +70,10 @@ module.exports = {
                 take: limit,
                 where: {
                     isCertified: false,
+                    NOT: [
+                        { photoProfil: null },
+                        { description: null }
+                    ]
                 },
                 select: {
                     id: true,
