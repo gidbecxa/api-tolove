@@ -15,6 +15,8 @@ exports.verifySchema = yup.object().shape({
 
 exports.loginSchema = yup.object({
     usernameOrEmail: yup.string().required().trim(),
+    password: yup.string().required()
+
 });
 
 exports.loginAdminSchema = yup.object({
@@ -69,10 +71,19 @@ exports.agentUserSchema = yup.object({
     villes: yup.string().required('Villes is required'),
 });
 
+
 // COUNTRY VALIDATION SCHEMAS
 
 exports.addCountrySchema = yup.object({
     name: yup.string().required(errorTypeOne)
+});
+
+exports.updateCountrySchema = yup.object({
+    name: yup.string().required(errorTypeOne)
+});
+
+exports.deleteCountrySchema = yup.object({
+    id: yup.string().required('ID is required')
 });
 
 // CITY VALIDATION SCHEMAS
@@ -81,46 +92,16 @@ exports.addCitySchema = yup.object({
     name: yup.string().required(errorTypeOne)
 });
 
-// SUBSCRIPTION VALIDATION SCHEMAS
-
-exports.addSubscriptionSchema = yup.object({
-    name: yup.string().required('Name is required'),
-    status: yup.string().required('Status required'),
+exports.updateCitySchema = yup.object({
+    name: yup.string().required(errorTypeOne)
 });
 
-// COMPANY VALIDATION SCHEMAS
-
-exports.companyRegisterSchema = yup.object({
-    phoneNumber: yup.string().required(errorTypeOne),
-    // password: yup.string().required(errorTypeOne).matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/, "Minimum huit caractères, au moins une lettre majuscule, une lettre minuscule et un chiffre")
+exports.deleteCitySchema = yup.object({
+    id: yup.string().required('ID is required')
 });
 
-exports.companyVerifySchema = yup.object().shape({
-    code: yup.string().required().length(6)
-});
-
-exports.companyLoginSchema = yup.object({
-    usernameOrEmail: yup.string().required().trim(),
-    password: yup.string().required()
-
-});
-
-exports.companySubscriptionSchema = yup.object({
-    companyId: yup.string().required('Company ID is required'),
-    subscriptionId: yup.string().required('Subscription ID is required')
-});
-
-// CARTE VALIDATION SCHEMAS
-exports.addCarteSchema = yup.object({
-    name: yup.string().required('Name is required'),
-    OpenDaysTime: yup.string().required('Open Days and Times are required'),
-    countryId: yup.string().required('Country ID is required'),
-    cityId: yup.string().required('City ID is required'),
-    // image: yup.string().required('Image is required'),
-    typeCarte: yup.string().required('Carte Type is required'),
-});
-
-exports.updateCarteSchema = yup.object({
+// RESTO VALIDATION SCHEMAS
+exports.addRestoSchema = yup.object({
     name: yup.string().required('Name is required'),
     OpenDaysTime: yup.string().required('Open Days and Times are required'),
     countryId: yup.string().required('Country is required'),
@@ -128,25 +109,53 @@ exports.updateCarteSchema = yup.object({
     image: yup.string().required('Image is required'),
 });
 
-exports.likeCarteSchema = yup.object({
+exports.updateRestoSchema = yup.object({
+    name: yup.string().required('Name is required'),
+    OpenDaysTime: yup.string().required('Open Days and Times are required'),
+    countryId: yup.string().required('Country is required'),
+    cityId: yup.string().required('City is required'),
+    image: yup.string().required('Image is required'),
+});
+
+exports.deleteRestoSchema = yup.object({
+    id: yup.string().required('ID is required')
+});
+
+exports.likeRestoSchema = yup.object({
     userId: yup.string().required('User ID is required'),
-    carteId: yup.string().required('Carte ID is required'),
+    restoId: yup.string().required('Resto ID is required'),
 });
 
-exports.unLikeCarteSchema = yup.object({
+exports.unLikeRestoSchema = yup.object({
     userId: yup.string().required('User ID is required'),
-    carteId: yup.string().required('Carte ID is required'),
+    restoId: yup.string().required('Resto ID is required'),
 });
 
-exports.addNewPhotoCarteSchema = yup.object({
-    path_url: yup.string().required('Image path URL is required'),
-    carteId: yup.string().required('Carte ID is required'),
+// HOSTEL VALIDATION SCHEMAS
+exports.addHostelSchema = yup.object({
+    name: yup.string().required('Name is required'),
+    countryId: yup.string().required('Country is required'),
+    cityId: yup.string().required('City is required'),
+    image: yup.string().required('Image is required'),
 });
 
-exports.updateCompanySchema = yup.object({
-    username: yup.string().required(errorTypeOne),
-    category: yup.string().required().oneOf(["Restaurant", "Evenement", "Cadeau", "Hotel"], "Genre invalide"),
-    country: yup.string().required(),
-    email: yup.string().required(errorTypeOne).email("Email Invalide"),
-    city: yup.string().required(errorTypeOne)
+exports.updateHostelSchema = yup.object({
+    name: yup.string().required('Name is required'),
+    countryId: yup.string().required('Country is required'),
+    cityId: yup.string().required('City is required'),
+    image: yup.string().required('Image is required'),
+});
+
+exports.deleteHostelSchema = yup.object({
+    id: yup.string().required('ID is required')
+});
+
+exports.likeHostelSchema = yup.object({
+    userId: yup.string().required('User ID is required'),
+    restoId: yup.string().required('Hostel ID is required'),
+});
+
+exports.unLikeHostelSchema = yup.object({
+    userId: yup.string().required('User ID is required'),
+    restoId: yup.string().required('Hostel ID is required'),
 });

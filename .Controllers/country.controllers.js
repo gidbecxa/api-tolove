@@ -3,6 +3,8 @@ const prisma = new PrismaClient();
 
 module.exports = {
     getAll: async (req, res) => {
+        console.log("Fetching countries...");
+        
         try {
             const countries = await prisma.country.findMany({
                 select: {
@@ -138,20 +140,24 @@ module.exports = {
     deleteCountry: async (req, res) => {
 
         const { id } = req.params
-        try {
-            const deleteCountry = await prisma.country.delete({
-                where: {
-                    id: parseInt(id),
-                },
-            })
 
-            const statusCode = deleteCountry ? 200 : 404;
-            const response = deleteCountry || { message: `Cannot delete country with id = ${id}` };
-            res.status(statusCode).send(response);
-        } catch (error) {
-            res.status(500).send({
-                message: error.message || `Some error occurred while deleting the country with id=${id}`,
-            });
-        }
+        const deleteCountry = Country.delete({
+            where: {
+                id: parseInt(id),
+            },
+        })
+
+        prisma
+            .$transaction([deleteCountry])
+            .then(() => {
+                res.status(200).send({
+                    message: 'Country has been deleted successfully',
+                })
+            })
+            .catch((error) => {
+                res.status(500).send({
+                    message: error.message || `Some error occurred while deleting the country with id=${id}`,
+                })
+            })
     },
 }

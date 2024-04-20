@@ -2,9 +2,8 @@ const jwt = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient();
 const { User } = prisma;
-const { Company } = prisma;
-const { JWT_SECRET } = require('../configEnv');
-
+const {JWT_SECRET } = require('../configEnv');
+ 
 exports.authMiddleware = async (req, res, next) => {
 
   try {
@@ -19,18 +18,18 @@ exports.authMiddleware = async (req, res, next) => {
         msg: 'Missing Authorization header'
       });
     }
-
+ 
     /* 2. On vérifie que le header Authorization contient bien le token */
     const [scheme, token] = headers.authorization.split(' ');
     // console.log(token);
-
+ 
     if (!scheme || scheme.toLowerCase() !== 'bearer' || !token) {
       return res.status(401).json({
         success: false,
         msg: 'Header format is Authorization: Bearer token'
       });
     }
-
+ 
     /* 3. On vérifie et décode le token à l'aide du secret et de l'algorithme utilisé pour le générer */
     const decodedToken = jwt.verify(token, JWT_SECRET);
 
@@ -76,10 +75,10 @@ exports.authMiddleware = async (req, res, next) => {
         msg: `User ${userId} not exists`
       });
     }
-
+ 
     /* 5. On passe l'utilisateur dans notre requête afin que celui-ci soit disponible pour les prochains middlewares */
     req.user = user;
-
+ 
     /* 7. On appelle le prochain middleware */
     return next();
 
@@ -101,92 +100,14 @@ exports.userMiddleware = (req, res, next) => {
 
 exports.adminMiddleware = (req, res, next) => {
   if (req.user.role !== "ADMIN") {
-    return res.status(400).json({ success: false, msg: "Admin Access denied" })
+    return res.status(400).json({success: false, msg: "Admin Access denied" })
   }
   next()
-}
+} 
 
 exports.agentMiddleware = (req, res, next) => {
   if (req.user.role !== "AGENT") {
     return res.status(400).json({ success: false, msg: "AGENT Access denied" })
   }
   next()
-}
-
-
-exports.companyMiddleware = async (req, res, next) => {
-  try {
-
-    const { headers } = req;
-    //console.log(headers);
-
-    /* 1. On vérifie que le header Authorization est présent dans la requête */
-    if (!headers || !headers.authorization) {
-      return res.status(401).json({
-        success: false,
-        msg: 'Missing Authorization header'
-      });
-    }
-
-    /* 2. On vérifie que le header Authorization contient bien le token */
-    const [scheme, token] = headers.authorization.split(' ');
-    // console.log(token);
-
-    if (!scheme || scheme.toLowerCase() !== 'bearer' || !token) {
-      return res.status(401).json({
-        success: false,
-        msg: 'Header format is Authorization: Bearer token'
-      });
-    }
-
-    /* 3. On vérifie et décode le token à l'aide du secret et de l'algorithme utilisé pour le générer */
-    const decodedToken = jwt.verify(token, JWT_SECRET);
-
-    /* 4. On vérifie que l'utilisateur existe bien dans notre base de données */
-    const companyId = decodedToken.userId;
-    console.log('JWT Verify: userId:', companyId);
-
-    const company = await Company.findUnique(
-      {
-        where: { id: companyId },
-        select: {
-          id: true,
-          phoneNumber: true,
-          username: true,
-          description: true,
-          email: true,
-          country: true,
-          city: true,
-          category: true,
-          logo: true,
-          location: true,
-          mapAddress: true,
-          subscriptionId: true,
-          solde: true,
-        },
-      }
-    );
-
-    // console.log(user);
-
-    if (!company) {
-      return res.status(401).json({
-        success: false,
-        msg: `Company ${companyId} not exist`
-      });
-    }
-
-    /* 5. On passe l'utilisateur dans notre requête afin que celui-ci soit disponible pour les prochains middlewares */
-    req.company = company;
-
-    /* 7. On appelle le prochain middleware */
-    return next();
-
-  } catch (err) {
-
-    return res.status(401).json({
-      message: 'Invalid token'
-    });
-
-  }
-}
+} 

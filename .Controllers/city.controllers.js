@@ -132,20 +132,24 @@ module.exports = {
     deleteCity: async (req, res) => {
 
         const { id } = req.params
-        try {
-            const deleteCity = await prisma.city.delete({
-                where: {
-                    id: parseInt(id),
-                },
-            });
 
-            const statusCode = deleteCity ? 200 : 404;
-            const response = deleteCity || { message: `Cannot delete city with id = ${id}` };
-            res.status(statusCode).send(response);
-        } catch (error) {
-            res.status(500).send({
-                message: error.message || `Some error occurred while deleting the city with id=${id}`,
-            });
-        }
+        const deleteCity = City.delete({
+            where: {
+                id: parseInt(id),
+            },
+        })
+
+        prisma
+            .$transaction([deleteCity])
+            .then(() => {
+                res.status(200).send({
+                    message: 'City has been deleted successfully',
+                })
+            })
+            .catch((error) => {
+                res.status(500).send({
+                    message: error.message || `Some error occurred while deleting the city with id=${id}`,
+                })
+            })
     },
 }

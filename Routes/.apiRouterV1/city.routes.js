@@ -3,7 +3,7 @@ const cityCtrl = require('../../Controllers/city.controllers');
 const { authMiddleware } = require('../../Middlewares/jwtauth.middlewares');
 const { ValidatorMiddlewares } = require('../../Middlewares/validator.middlewares');
 const {
-    addCitySchema,
+    addCitySchema, updateCitySchema, deleteCitySchema,
 } = require('../../Utils/validationShema');
 
 module.exports = (apiRouter) => {
@@ -14,8 +14,8 @@ module.exports = (apiRouter) => {
     // post routes
     apiRouter.route('/city/searchCity').post(cityCtrl.searchCity);
     apiRouter.route('/city/addCity').post(ValidatorMiddlewares(addCitySchema), cityCtrl.addCity);
-    apiRouter.route('/city/deleteCity/:id').post(authMiddleware, cityCtrl.deleteCity);
+    apiRouter.route('/city/deleteCity/:id').post(ValidatorMiddlewares(deleteCitySchema), authMiddleware, cityCtrl.deleteCity);
 
     // put routes
-    apiRouter.route('/city/updateCity/:id').put(authMiddleware, cityCtrl.updateCity);
+    apiRouter.route('/city/updateCity/:id').put(ValidatorMiddlewares(updateCitySchema), authMiddleware, cityCtrl.updateCity);
 };

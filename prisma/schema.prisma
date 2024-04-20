@@ -23,7 +23,7 @@ model User {
   description String?
   preference Json?
   genre Genre?
-  coins Float  @default(0)
+  coins Int  @default(0)
   isCertified Boolean  @default(false)
   isCompleted Boolean @default(false)
   isFake Boolean  @default(false)
@@ -50,10 +50,10 @@ model User {
   initiatedLock LockedConversation[] @relation("initiatedLocks")
   receivedLock LockedConversation[] @relation("receivedLocks")
   podiumUsers Podium[]
-  restoLikes LikedResto[]
-  hostelLikes LikedHostel[]
-  restoReservations RestoReservation[]
-  hostelReservations HostelReservation[]
+  carteLikes LikedCarte[]
+  carteReservations CarteReservation[]
+
+  createdAt   DateTime @default(now())
 }
 
 enum Genre {
@@ -209,8 +209,7 @@ model Country {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  restos Resto[]
-  hostels Hostel[]
+  cartes Carte[]
 }
 
 model City {
@@ -219,89 +218,115 @@ model City {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  restos Resto[]
-  hostels Hostel[]
+  cartes Carte[]
 }
 
-model Resto {
+enum SubscriptionStatus {
+  HOTEL
+  RESTAURANT
+  TRANSPORT
+  EVENEMENT
+}
+
+model Subscription {
   id              Int              @id @default(autoincrement())
   name            String
   description     String?
+  status          SubscriptionStatus
+  price           Int
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  subscriptions     CompanySubscription[]   
+}
+
+model Company {
+  id Int @id @default(autoincrement())
+  phoneNumber String @unique
+  username String?  @unique
+  email String?
+  category String?
+  logo String?
+  description String?
+  country String?
+  city String?
+  location String?
+  mapAddress String?
+  solde Int?
+  subscriptionId    Int?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime? @updatedAt
+
+  subscriptions     CompanySubscription[]   
+  cartes     Carte[]   
+}
+
+model CompanySubscription {
+  id                Int              @id @default(autoincrement())
+  companyId         Int
+  subscriptionId    Int
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  company           Company        @relation(fields: [companyId], references: [id])
+  subscription      Subscription        @relation(fields: [subscriptionId], references: [id])
+}
+
+model Carte {
+  id              Int              @id @default(autoincrement())
+  name            String
+  email           String
+  mapAddress      String?
+  description     String?
   location        String?
-  OpenDaysTime    Json
+  OpenDaysTime    String
   countryId       Int
   cityId          Int
   image           String
+  companyId       Int
+  typeCarte       SubscriptionStatus
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   
   country         Country             @relation(fields: [countryId], references: [id])
   city            City                @relation(fields: [cityId], references: [id])
-  likes           LikedResto[]
-  reservations    RestoReservation[]
+  company         Company        @relation(fields: [companyId], references: [id])
+  likes           LikedCarte[]
+  reservations    CarteReservation[]
+  carteOtherPhotos    CarteOthersPhoto[]
 }
 
-model Hostel {
+model CarteOthersPhoto {
   id              Int              @id @default(autoincrement())
-  name            String
-  description     String?
-  location        String?
-  countryId       Int
-  cityId          Int
-  image           String
-  createdAt       DateTime         @default(now())
+  name            String?
+  path_url        String
+  carteId         Int
+  createdAt       DateTime @default(now())
   updatedAt       DateTime         @updatedAt
 
-  country         Country          @relation(fields: [countryId], references: [id])
-  city            City             @relation(fields: [cityId], references: [id])
-  likes           LikedHostel[]
-  reservations    HostelReservation[]
+  carte           Carte   @relation(fields: [carteId], references: [id], onDelete: Cascade)
 }
 
-model LikedResto {
+model LikedCarte {
   id              Int              @id @default(autoincrement())
   userId          Int              
-  restoId         Int              
+  carteId         Int              
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
   user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  resto           Resto            @relation(fields: [restoId], references: [id], onDelete: Cascade)
+  carte           Carte            @relation(fields: [carteId], references: [id], onDelete: Cascade)
 }
 
-model LikedHostel {
-  id              Int              @id @default(autoincrement())
-  userId          Int              
-  hostelId        Int              
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-
-  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  hostel          Hostel           @relation(fields: [hostelId], references: [id], onDelete: Cascade)
-}
-
-model RestoReservation {
+model CarteReservation {
   id              Int              @id @default(autoincrement())
   userId          Int
-  restoId         Int   
+  carteId         Int   
   startDate       DateTime
   endDate         DateTime
   totalPrice      Int?
   createdAt       DateTime @default(now())
 
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  resto           Resto   @relation(fields: [restoId], references: [id], onDelete: Cascade)
-}
-
-model HostelReservation {
-  id              Int              @id @default(autoincrement())
-  userId          Int
-  hostelId        Int   
-  startDate       DateTime
-  endDate         DateTime
-  totalPrice      Int?
-  createdAt       DateTime @default(now())
-
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  hostel          Hostel   @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  carte           Carte   @relation(fields: [carteId], references: [id], onDelete: Cascade)
 }

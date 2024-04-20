@@ -1,13 +1,12 @@
 var express = require('express');
 const authRoutes = require('./auth.routes')
-const usersRoutes = require('./users.routes');
 const adminRoutes = require('./agents.routes');
+const usersRoutes = require('./users.routes');
 const countryRoutes = require('./country.routes');
 const cityRoutes = require('./city.routes');
-const companyRoutes = require('./company.routes');
-const subscriptionRoutes = require('./subscription.routes');
 const podiumRoutes = require('./podium.routes');
-const carteRoutes = require('./carte.routes');
+const restoRoutes = require('./resto.routes');
+const hostelRoutes = require('./hostel.routes');
 
 exports.router = (function() {
 
@@ -15,12 +14,12 @@ exports.router = (function() {
 
     //Auth route
     authRoutes(apiRouter)
+    
+    // Admin routes
+    adminRoutes(apiRouter)
 
     // Users routes
     usersRoutes(apiRouter)
-
-    // Admin routes
-    adminRoutes(apiRouter)
 
     // Country routes
     countryRoutes(apiRouter)
@@ -28,17 +27,14 @@ exports.router = (function() {
     // City routes
     cityRoutes(apiRouter)
     
-    // Companyt routes
-    companyRoutes(apiRouter)
-    
-    // Subscription routes
-    subscriptionRoutes(apiRouter)
-
     // Podium routes
     podiumRoutes(apiRouter)
     
-    // Carte routes
-    carteRoutes(apiRouter)
+    // Resto routes
+    restoRoutes(apiRouter)
+    
+    // Hostel routes
+    hostelRoutes(apiRouter)
 
     return apiRouter;
     

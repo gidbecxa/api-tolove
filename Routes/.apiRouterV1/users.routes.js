@@ -18,16 +18,9 @@ module.exports = (apiRouter) => {
     apiRouter.route('/users/getuser/:id').get(authMiddleware, usersCtrl.getUser);
     apiRouter.route('/users/me').get(authMiddleware, usersCtrl.getMe);
 
-    apiRouter.route('/users/getusersByAgesInterval').get(authMiddleware, usersCtrl.getusersByAgesInterval);
-    apiRouter.route('/users/getUsersInSameCountry/:id').get(authMiddleware, usersCtrl.getUsersInSameCountry);
-    apiRouter.route('/users/getUsersOfSameDisponibility').get(authMiddleware, usersCtrl.getUsersOfSameDisponibility);
-
     apiRouter.route('/chatrooms/:id').get(authMiddleware, usersCtrl.getChatroomsByParticipant);
     apiRouter.route('/matches/:id').get(authMiddleware, usersCtrl.getUserMatches);
     apiRouter.route('/chatrooms/messages/:chatroomId').get(authMiddleware, usersCtrl.getAllChatroomMessages);
-
-    apiRouter.route('/chatrooms/messagesNotReadCount/:chatroomId').get(authMiddleware, usersCtrl.getAllChatroomMessagesNotReadCount);
-    
     apiRouter.route('/chatrooms/last-message/:chatroomId').get(authMiddleware, usersCtrl.getLastMessage);
     apiRouter.route('/users/get-profile-photo/:id').get(authMiddleware, usersCtrl.getProfilePhoto);
     apiRouter.route('/gifts/get-gifts').get(authMiddleware, usersCtrl.getGifts);

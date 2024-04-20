@@ -14,8 +14,9 @@ const prisma = new PrismaClient();
 
 module.exports = {
 
-    register: async function (req, res) {
+    registerWithTwilio: async function (req, res) {
         const { pays, phoneNumber } = req.body;
+        console.log("Attempting to verify user:", phoneNumber);
         let verificationRequest;
 
         try {
@@ -32,10 +33,12 @@ module.exports = {
             if (response.length > 0) {
                 return res.status(422).send({ success: false, msg: 'This phone number is already in use' });
             } else {
+                console.log('User phone number is not yet in use!');
+
                 verificationRequest = await twilio.verify.v2.services(VERIFICATION_SID)
                     .verifications
                     .create({ to: phoneNumber, channel: 'sms' })
-                    .then(verification => console.log('sid:', verification.sid));
+                    // .then(verification => console.log('Verification data:', verification));
 
                 res.status(201).send({
                     success: true,
@@ -51,7 +54,7 @@ module.exports = {
         logger.debug(verificationRequest);
     },
 
-    /* register: async function (req, res) {
+    register: async function (req, res) {
         const { pays, phoneNumber } = req.body;
         // let verificationRequest;
 
@@ -80,13 +83,14 @@ module.exports = {
             return res.status(500).send(error);
         }
 
-    }, */
+    },
 
     createUserByAgent: async function (req, res) {
-        // console.log("Request body:", req.body);
+        console.log("Request body:", req.body);
         const { username, pays, phoneNumber, birthday, description, preference, genre, hobbies, ville } = req.body;
-        const birthdayFormatted = new Date(birthday);
-        console.log("Attempting to create user:", { username, pays, phoneNumber, birthdayFormatted, description, preference, genre, hobbies, ville });
+        // const birthdayFormatted = new Date(birthday).toISOString().slice(0, 19).replace('T', ' ');
+        const birthdayFormatted = new Date(birthday).toISOString().slice(0, 10) + 'T23:00:00.000Z';
+        console.log("Attempting to create user:", { username, pays, phoneNumber, birthday, description, preference, genre, hobbies, ville });
         const { agentId } = req.params;
         console.log("Attempting to create user for agent:", { agentId });
 
@@ -109,7 +113,7 @@ module.exports = {
             }
 
             const uploadParams = {
-                Bucket: 'user.toloveapp-storage',
+                Bucket: 'user.dmvision-bucket',
                 Key: `user${agentId}/${filename}`,
                 Body: fs.createReadStream(path),
                 ContentType: file.mimetype
@@ -158,7 +162,44 @@ module.exports = {
         }
     },
 
-    verify: async function (req, res) {
+    createAgent: async function (req, res) {
+        console.log("Request body for mod creation:", req.body);
+        const { pays, phoneNumber, username } = req.body;
+        // console.log("Attempting to create user:", { data });
+
+        const { agentId } = req.params;
+        console.log("Attempting to create user for agent:", { agentId });
+
+        try {
+            const existingUser = await prisma.user.findFirst({
+                where: {
+                    phoneNumber: phoneNumber,
+                },
+            });
+
+            if (existingUser) {
+                return res.status(422).send({ success: false, msg: 'User with this phone number exists already' });
+            }
+
+            // Create a new user in the database
+            const newUser = await prisma.user.create({
+                data: {
+                    phoneNumber: phoneNumber,
+                    username: username,
+                    pays: pays,
+                    role: 'AGENT',
+                    // assignedAgent: parseInt(agentId),
+                },
+            });
+
+            return res.status(201).send({ success: true, msg: 'User was created successfully', user: newUser });
+        } catch (error) {
+            console.error('Error creating user:', error);
+            res.status(500).json({ success: false, error: "Failed to create user" });
+        }
+    },
+
+    verifyViaTwilio: async function (req, res) {
         // const { verificationCode: code } = req.body;
         const { code, phoneNumber, pays } = req.body;
         console.log(code, pays, phoneNumber);
@@ -170,6 +211,45 @@ module.exports = {
             verificationResult = await twilio.verify.v2.services(VERIFICATION_SID)
                 .verificationChecks
                 .create({ to: phoneNumber, code: code })
+                // .then(verification_check => console.log('Verification result data', verification_check));
+
+            if (verificationResult && verificationResult.status === 'approved') {
+                console.log('Verification approved. Attempting to create user...');
+
+                try {
+                    const user = await prisma.user.create({
+                        data: {
+                            phoneNumber: phoneNumber,
+                            pays: pays,
+                        },
+                    });
+
+                    const userId = user.id;
+                    const accessToken = jwtUtils.generateTokenForUser(user);
+                    const refreshToken = jwtUtils.generateRefreshTokenForUser(user);
+
+                    res.status(201).send({
+                        success: true,
+                        msg: 'User was created successfully',
+                        data: {
+                            'userId': userId,
+                            'access_token': accessToken,
+                            'refresh_token': refreshToken,
+                        },
+                    });
+                } catch (error) {
+                    res.status(500).send({
+                        success: false,
+                        msg: error.message || 'Some error occurred while creating the user',
+                    });
+                }
+            } else {
+                console.log('Verification not approved.');
+                res.status(422).send({
+                    success: false,
+                    msg: 'Verification failed. Please check the verification code.',
+                });
+            }
         } catch (error) {
             logger.error(error);
             return res.status(500).send(error);
@@ -177,36 +257,7 @@ module.exports = {
 
         logger.debug(verificationResult);
 
-        if (verificationResult.status === 'approved') {
-            console.log('Attempting to create user...');
-            try {
-                const user = await prisma.user.create({
-                    data: {
-                        phoneNumber: phoneNumber,
-                        pays: pays,
-                    },
-                });
 
-                const userId = user.id;
-                const accessToken = jwtUtils.generateTokenForUser(user);
-                const refreshToken = jwtUtils.generateRefreshTokenForUser(user);
-
-                res.status(201).send({
-                    success: true,
-                    msg: 'User was created successfully',
-                    data: {
-                        'userId': userId,
-                        'access_token': accessToken,
-                        'refresh_token': refreshToken,
-                    },
-                });
-            } catch (error) {
-                res.status(500).send({
-                    success: false,
-                    msg: error.message || 'Some error occurred while creating the user',
-                });
-            }
-        }
         // errors.verificationCode = `Unable to verify code. status: ${verificationResult.status}`;
     },
 
@@ -262,7 +313,7 @@ module.exports = {
         // errors.verificationCode = `Unable to verify code. status: ${verificationResult.status}`;
     },
 
-    /* verify: async function (req, res) {
+    verify: async function (req, res) {
         // const { verificationCode: code } = req.body;
         const { code, phoneNumber, pays, username } = req.body;
         console.log(code, pays, phoneNumber);
@@ -297,22 +348,17 @@ module.exports = {
                 });
             }
         }
-    }, */
+    },
 
     login: async function (req, res) {
 
-        const { usernameOrEmail } = req.body
+        const { usernameOrEmail, password } = req.body
 
         await prisma.user.findMany({
             skip: 0,
             take: 1,
             where: {
                 OR: [
-                    {
-                        phoneNumber: {
-                            equals: usernameOrEmail,
-                        },
-                    },
                     {
                         username: {
                             equals: usernameOrEmail,
@@ -333,49 +379,42 @@ module.exports = {
                 role: true
             }
         })
-        .then((userFound) => {
+            .then((userFound) => {
 
-            if (userFound.length > 0) {
-                
-                if (userFound[0].isCertified === false || userFound[0].isCertified == "0") {
-                    return res.status(422).send({ success: false, msg: 'Sorry, this user is not verified' });
+                if (userFound.length > 0) {
+
+                    // console.log(userFound[0]);
+
+                    bcrypt.compare(password, userFound[0].password, (errBycrypt, resBycrypt) => {
+
+                        if (resBycrypt) {
+                            //refresh token...
+                            res.status(201).json({
+                                success: true,
+                                data: {
+                                    'userId': userFound[0].id,
+                                    'access_token': jwtUtils.generateTokenForUser(userFound[0]),
+                                    'refresh_token': jwtUtils.generateRefreshTokenForUser(userFound[0])
+                                }
+                            });
+
+                        } else {
+                            //message d'erreur mdp ou mail...
+                            res.status(403).json({ success: false, msg: 'username, email ou password invalide' });
+                        }
+
+                    });
+
+                }
+                else {
+                    res.status(404).json({ success: false, msg: 'cet utilisateur n\'existe pas' });
                 }
 
-                // console.log(userFound[0]);
-                bcrypt.compare(password, userFound[0].password,).then(function(result) {
-                    if (result) {
-                        //refresh token...
-                        res.status(201).json({
-                            success: true,
-                            data: {
-                                'userId': userFound[0].id,
-                                'access_token': jwtUtils.generateTokenForUser(userFound[0]),
-                                'refresh_token': jwtUtils.generateRefreshTokenForUser(userFound[0])
-                            }
-                        });
-
-                    } else {
-                        //message d'erreur mdp incorrect...
-                        res.status(403).json({ success: false, msg: 'Password is not valid' });
-                    }
-                });
-
-                // bcrypt.compare(password, userFound[0].password, (errBycrypt, resBycrypt) => {
-
-                    
-
-                // });
-
-            }
-            else {
-                res.status(404).json({ success: false, msg: 'cet utilisateur n\'existe pas' });
-            }
-
-        })
-        .catch((err) => {
-            console.log(err);
-            res.status(500).json({ success: false, msg: 'Unable to verify user' });
-        });
+            })
+            .catch((err) => {
+                console.log(err);
+                res.status(500).json({ success: false, msg: 'unable to verify user' });
+            });
 
     },
 

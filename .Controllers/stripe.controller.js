@@ -1,3 +1,6 @@
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
+
 const { STRIPE_SECRET_KEY } = require("../configEnv");
 const logger = require("../logger");
 const stripe = require('stripe')(STRIPE_SECRET_KEY);
@@ -80,28 +83,34 @@ module.exports = {
 
     createPaymentIntent: async (req, res) => {
         console.log('req for creating payment intent:', req.body);
-        const { paymentMethodId, items } = req.body;
+        const { paymentMethodId, items, userId } = req.body;
         const packIndex = items[0].id;
 
         try {
             let amount = 0;
+            let coins = 0;
 
             // set the amount based on the price of the pack
             switch (packIndex) {
                 case 1:
-                    amount = 1499;
+                    amount = 1000;
+                    coins = 10;
                     break;
                 case 2:
-                    amount = 2999;
+                    amount = 1500;
+                    coins = 15;
                     break;
                 case 3:
-                    amount = 4999;
+                    amount = 5000;
+                    coins = 50;
                     break;
                 case 4:
-                    amount = 9999;
+                    amount = 10000;
+                    coins = 100;
                     break;
                 case 5:
-                    amount = 24999;
+                    amount = 25000;
+                    coins = 250;
                     break;
                 default:
                     break;
@@ -117,7 +126,22 @@ module.exports = {
             });
 
             // console.log(paymentIntent.status, paymentIntent.client_secret);
+
+            if (paymentIntent.status === 'succeeded') {
+                await prisma.user.update({
+                    where: {
+                        id: parseInt(userId),
+                    },
+                    data: {
+                        coins: {
+                            increment: coins
+                        },
+                    },
+                });
+            }
+
             console.log("paymentIntent:", paymentIntent);
+
             res.json({
                 clientSecret: paymentIntent.client_secret,
                 status: paymentIntent.status,
