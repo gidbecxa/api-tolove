@@ -138,6 +138,160 @@ module.exports = {
         }
     },
 
+    getusersByAgesInterval: async (req, res) => {
+        const { firstAge, secondAge } = req.body;
+        console.log(`Query: limit: ${req.query.limit}, page: ${req.query.page}`);
+        const limit = parseInt(req.query.limit) || 8;
+        const page = parseInt(req.query.page) || 0;
+
+        try {
+            const totalRows = await prisma.user.count();
+
+            const getUsersBetweenTwoAges = prisma.user.findMany({
+                where: {
+                    userAge: {
+                        gte: parseInt(firstAge), // Start of age range
+                        lte: parseInt(secondAge), // End of age range
+                    },
+                },
+                orderBy: { createdAt: 'desc' }
+            });
+
+            const totalPage = Math.ceil(totalRows / limit);
+
+            res.status(200).json({
+                result: getUsersBetweenTwoAges,
+                page: page,
+                limit: limit,
+                totalRows: totalRows,
+                totalPage: totalPage
+            });
+        } catch (error) {
+            res.status(500).send({
+                message: error.message || 'Some error occurred while retrieving users by age interval',
+            })
+        }
+    },
+
+    getUsersInSameCountry: async (req, res) => {
+        const { id } = req.params;
+
+        try {
+            const user = await prisma.user.findUnique({
+                where: { id: parseInt(id) },
+                select: {
+                    id: true,
+                    coins: true,
+                },
+            });
+
+            if (!user) {
+                res.status(404).send({ message: `Cannot find user with id = ${id}` });
+            }
+
+            const users = await prisma.user.findMany({
+                where: {
+                    pays: user.pays,
+                    isOnline: true
+                },
+                select: {
+                    id: true,
+                    username: true,
+                    phoneNumber: true,
+                    birthday: true,
+                    langage: true,
+                    genre: true,
+                    hobbies: true,
+                    description: true,
+                    photoProfil: true,
+                    pays: true,
+                    villes: true,
+                },
+            });
+
+            res.status(200).send(users);
+        } catch (error) {
+            res.status(500).send({
+                message: error.message || `An error occurred`,
+            });
+        }
+    },
+
+    getUsersOfSameDisponibility: async (req, res) => {
+        console.log(`Query: limit: ${req.query.limit}, page: ${req.query.page}`);
+        const limit = parseInt(req.query.limit) || 8;
+        const page = parseInt(req.query.page) || 0;
+
+        try {
+            const currentUser = await prisma.user.findUnique({
+                where: {
+                    id: req.user.id,
+                },
+                select: {
+                    disponiblePour: true,
+                },
+            });
+
+            const disponiblePour = currentUser.disponiblePour || null;
+
+            const whereQueries = {
+                NOT: {
+                    id: {
+                        equals: req.user.id,
+                    }
+                },
+                role: 'USER',
+                disponiblePour: disponiblePour,
+                to: {
+                    // to get profiles that the user hasn't matched with
+                    none: {
+                        from: {
+                            id: req.user.id,
+                        },
+                        isConfirm: true,
+                    },
+                },
+            };
+
+            const totalRows = await prisma.user.count({
+                where: whereQueries,
+            });
+
+            const users = await prisma.user.findMany({
+                skip: limit * page,
+                take: limit,
+                where: whereQueries,
+                select: {
+                    id: true,
+                    username: true,
+                    birthday: true,
+                    description: true,
+                    disponiblePour: true,
+                    genre: true,
+                    photoProfil: true,
+                    pays: true,
+                },
+                orderBy: {
+                    id: 'desc', // Order by the ID in descending order (most recent first)
+                },
+            });
+
+            const totalPage = Math.ceil(totalRows / limit);
+
+            res.status(200).json({
+                result: users,
+                page: page,
+                limit: limit,
+                totalRows: totalRows,
+                totalPage: totalPage
+            });
+        } catch (error) {
+            res.status(500).send({
+                message: error.message || 'Some error occurred while retrieving users',
+            })
+        }
+    },
+
     // Controller to update user's data from Complementpart1 screen
     updateProfilPartOne: async (req, res) => {
         const { id } = req.params;
@@ -538,6 +692,28 @@ module.exports = {
             return res.json({ messages: chatRoom.messages })
         } catch (error) {
             console.error('Error retrieving messages:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    },
+
+    getAllChatroomMessagesNotReadCount: async (req, res) => {
+        try {
+            const { chatroomId } = req.params;
+            console.log("Chatroom", chatroomId);
+            // Update the status of this chatRoom messages
+            const chatRoomMessagesCount = await prisma.chatRoom.count({
+                where: {
+                    chatRoom: {
+                        id: parseInt(chatroomId),
+                        messages: { isRead: false },
+                    }
+                },
+            });
+
+            // Return all messages
+            return res.json({ messagesCount: chatRoomMessagesCount })
+        } catch (error) {
+            console.error('Error retrieving messages count:', error);
             res.status(500).json({ error: 'Internal server error' });
         }
     },
