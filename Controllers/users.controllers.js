@@ -916,7 +916,6 @@ module.exports = {
             })
     },
 
-
     /*  updateLongLat: async function (req, res){
          const { id } = req.params
          const { longitude, latitude } = req.body

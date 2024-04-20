@@ -50,6 +50,53 @@ module.exports = {
         }
     },
 
+    getNonCertifiedUsers: async (req, res) => {
+        const limit = parseInt(req.query.limit) || 11;
+        const page = parseInt(req.query.page) || 0;
+
+        try {
+            const totalRows = await prisma.user.count({
+                where: {
+                    isCertified: false,
+                },
+            });
+
+            const users = await prisma.user.findMany({
+                skip: limit * page,
+                take: limit,
+                where: {
+                    isCertified: false,
+                },
+                select: {
+                    id: true,
+                    username: true,
+                    description: true,
+                    genre: true,
+                    photoProfil: true,
+                    pays: true,
+                    villes: true,
+                },
+                orderBy: {
+                    id: 'desc', // Order by the ID in descending order (most recent first)
+                },
+            });
+
+            const totalPage = Math.ceil(totalRows / limit);
+
+            res.status(200).json({
+                result: users,
+                page: page,
+                limit: limit,
+                totalRows: totalRows,
+                totalPage: totalPage
+            });
+        } catch (error) {
+            res.status(500).send({
+                message: error.message || 'Some error occurred while retrieving non-certified users',
+            });
+        }
+    },
+
     //----------------------- get in-app data -------------------------------
     getChatroomsByParticipant: async (req, res) => {
         const { id } = req.params;
