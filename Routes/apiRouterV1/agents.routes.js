@@ -16,6 +16,7 @@ module.exports = (apiRouter) => {
     // get routes
     // apiRouter.route('/agents/getuser/:id').get(agentsCtrl.getUser);
     // apiRouter.route('/agents/me').get(agentsCtrl.getMe);
+    
     apiRouter.route('/agents/getNonCertified').get(agentsCtrl.getNonCertifiedUsers);
 
     apiRouter.route('/agents/chatrooms/:id').get(agentsCtrl.getChatroomsByParticipant);
