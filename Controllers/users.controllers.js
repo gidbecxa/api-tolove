@@ -474,12 +474,18 @@ module.exports = {
                         orderBy: {
                             dateMessage: 'desc',
                         },
-                        take: 1,
+                        // take: 1,
                     },
                 },
             });
 
-            const sortedChatrooms = chatrooms.sort((a, b) => {
+            const sortedChatrooms = chatrooms.map(chatroom => {
+                const unreadMessagesCount = chatroom.messages.filter(message => message.status !== 'read').length;
+                return {
+                    ...chatroom,
+                    unreadMessagesCount,
+                };
+            }).sort((a, b) => {
                 const aLatestMessage = a.messages[0];
                 const bLatestMessage = b.messages[0];
 
@@ -493,6 +499,7 @@ module.exports = {
                     return 0;
                 }
             });
+            
             // console.log(chatrooms);
             res.status(200).json({ success: true, sortedChatrooms });
         } catch (error) {
