@@ -109,7 +109,7 @@ module.exports = {
             }
 
             const uploadParams = {
-                Bucket: 'user.toloveapp-storage',
+                Bucket: 'user.dmvision-bucket',
                 Key: `user${agentId}/${filename}`,
                 Body: fs.createReadStream(path),
                 ContentType: file.mimetype
