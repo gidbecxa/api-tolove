@@ -510,6 +510,26 @@ module.exports = {
         }
     },
 
+    updateMessagesStatusToRead: async (req, res) => {
+        const { id } = req.params;
+
+        try {
+            await prisma.message.updateMany({
+                where: {
+                    chatId: parseInt(id),
+                },
+                data: {
+                    status: 'read',
+                }
+            });
+
+            res.status(200).json({ success: true, message: 'Messages status updated to read' });
+        } catch (error) {
+            console.error("Error updating messages status to read: ", error);
+            res.status(500).json({ success: false, error: "Failed to update messages status to read" });
+        }
+    },
+
     getChatRoomIdForUsers: async (req, res) => {
         const { user1, user2 } = req.body;
 

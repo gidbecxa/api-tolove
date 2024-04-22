@@ -46,6 +46,7 @@ module.exports = (apiRouter) => {
     apiRouter.route('/users/update/coins/:id').put(authMiddleware, usersCtrl.updateCoins);
 
     // post routes
+    apiRouter.route('/chatroom/:id/messages/read').put(authMiddleware, usersCtrl.updateMessagesStatusToRead);
     apiRouter.route('/users/join-room').post(twilioCtrl.joinRoom);
     apiRouter.route('/create-payment-intent').post(stripeCtrl.createPaymentIntent);
     apiRouter.route('/create-payment-methods').post(stripeCtrl.createPaymentMethods);
