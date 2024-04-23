@@ -55,4 +55,5 @@ module.exports = (apiRouter) => {
     apiRouter.route('/users/check-locked').post(authMiddleware, usersCtrl.checkLockedUsers);
     apiRouter.route('/chatrooms/getchatroom/by-participants').post(authMiddleware, usersCtrl.getChatRoomIdForUsers);
     apiRouter.route('/gifts/create-gift').post(authMiddleware, upload.single('image'), usersCtrl.createGift);
+    apiRouter.route('/purchase/new-purchase').post(authMiddleware, usersCtrl.createPurchase);
 };
