@@ -499,7 +499,7 @@ module.exports = {
                     return 0;
                 }
             });
-            
+
             // console.log(chatrooms);
             res.status(200).json({ success: true, sortedChatrooms });
         } catch (error) {
@@ -1332,5 +1332,30 @@ module.exports = {
             res.status(500).json({ error: 'Internal server error' });
         }
     },
+
+    createPurchase: async (req, res) => {
+        try {
+            console.log("Creating new purchase...");
+            console.log("New purchase details:", req.body);
+
+            const { giftId, quantity, senderId, receiverId } = req.body;
+
+            const newPurchase = await prisma.purchase.create({
+                data: {
+                    gift: { connect: { id: parseInt(giftId) } },
+                    qtyPurchased: parseInt(quantity),
+                    datePurchased: new Date(),
+                    sender: { connect: { id: parseInt(senderId) } },
+                    receiver: { connect: { id: parseInt(receiverId) } },
+                },
+            });
+
+            console.log("Purchase successfully created", newPurchase);
+            res.status(200).json({ success: true, newPurchase });
+        } catch (error) {
+            console.error('Error creating purchase:', error);
+            res.status(500).json({ error: 'Failed to create purchase' });
+        }
+    }
 
 }
