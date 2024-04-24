@@ -1378,10 +1378,10 @@ module.exports = {
                 },
             });
 
-            if (purchases.length === 0) {
-                console.log(`No purchases found for sender ID ${senderId} and receiver ID ${receiverId}`);
-                return null;
-            }
+            // if (purchases.length === 0) {
+            //     console.log(`No purchases found for sender ID ${senderId} and receiver ID ${receiverId}`);
+            //     return null;
+            // }
 
             console.log(`Found ${purchases.length} purchases for sender ID ${senderId} and receiver ID ${receiverId}`);
             res.status(200).json(purchases);
