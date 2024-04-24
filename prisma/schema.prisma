@@ -176,15 +176,24 @@ enum GiftCategory {
 }
 
 model Purchase {
-  id                Int       @id @default(autoincrement())
-  gift              Gift      @relation(fields: [giftId], references: [id])
+  id                Int               @id @default(autoincrement())
+  gift              Gift              @relation(fields: [giftId], references: [id])
   giftId            Int
-  qtyPurchased      Int
+  qtyPurchased      Int               @default(1)
   datePurchased     DateTime
-  sender            User      @relation("purchaseSender", fields: [senderId], references: [id])
+  sender            User              @relation("purchaseSender", fields: [senderId], references: [id])
   senderId          Int
-  receiver          User      @relation("purchaseReceiver", fields: [receiverId], references: [id])
+  receiver          User              @relation("purchaseReceiver", fields: [receiverId], references: [id])
   receiverId        Int
+  status            PurchaseStatus    @default(pending)
+  deliveryAddress   String?
+  recipientFullName String?
+}
+
+enum PurchaseStatus {
+  pending
+  processing
+  received
 }
 
 model SocketMapping {
