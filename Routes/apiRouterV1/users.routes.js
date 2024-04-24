@@ -45,6 +45,7 @@ module.exports = (apiRouter) => {
     apiRouter.route('/users/update/profilePhoto/:id').put(authMiddleware, upload.single('image'), usersCtrl.updatePicture);
     apiRouter.route('/users/update/uploadPhoto/:id').put(authMiddleware, upload.single('image'), usersCtrl.uploadPhoto);
     apiRouter.route('/users/update/coins/:id').put(authMiddleware, usersCtrl.updateCoins);
+    apiRouter.route('/purchase/update-delivery-info').put(authMiddleware, usersCtrl.updatePurchaseDeliveryInfo);
 
     // post routes
     apiRouter.route('/chatroom/:id/messages/read').put(authMiddleware, usersCtrl.updateMessagesStatusToRead);

@@ -1365,7 +1365,8 @@ module.exports = {
             const purchases = await prisma.purchase.findMany({
                 where: {
                     senderId: parseInt(senderId),
-                    receiverId: parseInt(receiverId)
+                    receiverId: parseInt(receiverId),
+                    status: 'pending'
                 },
                 include: {
                     gift: {
@@ -1389,6 +1390,26 @@ module.exports = {
             console.error('Error fetching purchases:', error);
             res.status(500).json({ error: 'Failed to fetch purchases' });
         }
-    }
+    },
+
+    updatePurchaseDeliveryInfo: async (req, res) => {
+        const { purchaseId, fullName, deliveryAddress } = req.body;
+
+        try {
+            const purchase = await prisma.purchase.update({
+                where: { id: parseInt(purchaseId) },
+                data: {
+                    recipientFullName: fullName,
+                    deliveryAddress: deliveryAddress,
+                    status: 'processing'
+                }
+            });
+
+            res.status(200).json({ success: true, purchase });
+        } catch (error) {
+            console.error('Error updating purchase:', error);
+            res.status(500).json({ error: 'Failed to update purchase' });
+        }
+    },
 
 }
