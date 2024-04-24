@@ -32,6 +32,7 @@ module.exports = (apiRouter) => {
     apiRouter.route('/users/get-profile-photo/:id').get(authMiddleware, usersCtrl.getProfilePhoto);
     apiRouter.route('/gifts/get-gifts').get(authMiddleware, usersCtrl.getGifts);
     apiRouter.route('/gifts/get-gifts-by-category/:category').get(authMiddleware, usersCtrl.getGiftsByCategory);
+    apiRouter.route('/purchases/sender/:senderId/receiver/:receiverId').get(authMiddleware, usersCtrl.getPurchasesByUsers);
 
     // put routes
     apiRouter.route('/users/update/complementpart1/:id').put(ValidatorMiddlewares(updateProfilePartOneSchema), authMiddleware, usersCtrl.updateProfilPartOne);

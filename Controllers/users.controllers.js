@@ -1356,6 +1356,39 @@ module.exports = {
             console.error('Error creating purchase:', error);
             res.status(500).json({ error: 'Failed to create purchase' });
         }
+    },
+
+    getPurchasesByUsers: async (req, res) => {
+        const { senderId, receiverId } = req.params;
+
+        try {
+            const purchases = await prisma.purchase.findMany({
+                where: {
+                    senderId: parseInt(senderId),
+                    receiverId: parseInt(receiverId)
+                },
+                include: {
+                    gift: {
+                        select: {
+                            nom: true,
+                            image: true,
+                            giftCategory: true,
+                        },
+                    },
+                },
+            });
+
+            if (purchases.length === 0) {
+                console.log(`No purchases found for sender ID ${senderId} and receiver ID ${receiverId}`);
+                return res.status(404).json({ message: 'No purchases found' });
+            }
+
+            console.log(`Found ${purchases.length} purchases for sender ID ${senderId} and receiver ID ${receiverId}`);
+            res.status(200).json(purchases);
+        } catch (error) {
+            console.error('Error fetching purchases:', error);
+            res.status(500).json({ error: 'Failed to fetch purchases' });
+        }
     }
 
 }
