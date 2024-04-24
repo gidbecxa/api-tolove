@@ -1380,7 +1380,7 @@ module.exports = {
 
             if (purchases.length === 0) {
                 console.log(`No purchases found for sender ID ${senderId} and receiver ID ${receiverId}`);
-                return res.status(404).json({ message: 'No purchases found' });
+                return null;
             }
 
             console.log(`Found ${purchases.length} purchases for sender ID ${senderId} and receiver ID ${receiverId}`);
