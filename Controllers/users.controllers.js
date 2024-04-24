@@ -1392,6 +1392,33 @@ module.exports = {
         }
     },
 
+    getPurchasesForUser: async (req, res) => {
+        const { receiverId } = req.params;
+
+        try {
+            const purchases = await prisma.purchase.findMany({
+                where: {
+                    receiverId: parseInt(receiverId),
+                },
+                include: {
+                    gift: {
+                        select: {
+                            nom: true,
+                            image: true,
+                            giftCategory: true,
+                        },
+                    },
+                },
+            });
+
+            console.log(`Found ${purchases.length} purchases for receiver ID ${receiverId}`);
+            res.status(200).json(purchases);
+        } catch (error) {
+            console.error('Error fetching purchases:', error);
+            res.status(500).json({ error: 'Failed to fetch purchases' });
+        }
+    },
+
     updatePurchaseDeliveryInfo: async (req, res) => {
         const { purchaseId, fullName, deliveryAddress } = req.body;
 
