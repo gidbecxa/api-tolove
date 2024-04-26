@@ -10,3 +10,345 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id                Int                   @id @default(autoincrement())
+  phoneNumber       String                @unique
+  username          String?               @unique
+  photoProfil       String?
+  birthday          DateTime?
+  horoscope         String?
+  hobbies           Json?
+  langage           Json?
+  description       String?
+  preference        Json?
+  genre             Genre?
+  coins             Float                 @default(0)
+  isCertified       Boolean               @default(false)
+  isCompleted       Boolean               @default(false)
+  isFake            Boolean               @default(false)
+  longitude         Decimal?
+  latitude          Decimal?
+  pays              String?
+  villes            String?
+  isOnline          Boolean               @default(false)
+  preferencePays    String?
+  disponiblePour    String?
+  isVideoEnabled    Boolean               @default(false)
+  isLockEnabled     Boolean               @default(false)
+  firstOtherPhoto   String?
+  secondOtherPhoto  String?
+  thirdOtherPhoto   String?
+  role              Role                  @default(USER)
+  assignedAgent     Int?
+  deviceToken       String?
+
+  to                Match[]               @relation("to")
+  from              Match[]               @relation("from")
+  toNotified        Notification[]        @relation("toNotified") 
+  fromNotified      Notification[]        @relation("fromNotified")
+  socketMapping     SocketMapping?
+  initiatedLock     LockedConversation[]  @relation("initiatedLocks")
+  receivedLock      LockedConversation[]  @relation("receivedLocks")
+  podiumUsers       Podium[]
+  carteLikes        LikedCarte[]
+  carteReservations CarteReservation[]
+  sentPurchases     Purchase[]            @relation("purchaseSender")
+  receivedPurchases Purchase[]            @relation("purchaseReceiver")
+
+  createdAt         DateTime              @default(now())
+}
+
+enum Genre {
+  male
+  female
+  neutre
+}
+
+enum Role {
+  USER
+  ADMIN
+  AGENT
+}
+
+model Match {
+  id     Int    @id @default(autoincrement())
+  from    User @relation("from", fields: [fromId], references: [id])
+  fromId  Int
+  to   User @relation("to", fields: [toId], references: [id])
+  toId Int
+  isConfirm Boolean @default(false)
+  typeMatch TypeMatch  @default(normal)
+}
+
+enum TypeMatch {
+  boost
+  normal
+}
+
+model Notification {
+  id     Int    @id @default(autoincrement())
+  title  String 
+  content String
+  from    User @relation("fromNotified", fields: [fromNotifiedId], references: [id])
+  fromNotifiedId  Int
+  to   User @relation("toNotified", fields: [toNotifiedId], references: [id])
+  toNotifiedId Int
+}
+
+model ChatRoom {
+  id     Int    @id @default(autoincrement())
+  participant Json
+  lastMessage String?  @db.VarChar(1000)
+  lastMessageSender Int?
+  lastMessageStatus LastMessageStatus @default(pending)
+  isSentByAgent Boolean  @default(false)
+  agentId Int?
+  messages     Message[]
+}
+
+
+enum LastMessageStatus {
+  pending
+  send
+  unsend
+  received
+  read
+}
+
+model Message {
+  id          Int       @id @default(autoincrement())
+  contenu     String    @db.VarChar(1000)
+  title       String?
+  mediaUrl    String?
+  typeMessage TypeMessage @default(text)
+  sender      Int
+  dateMessage DateTime
+  status      Status    @default(pending)
+  isSentByAgent Boolean  @default(false)
+  chatRoom    ChatRoom  @relation(fields: [chatId], references: [id])
+  chatId      Int
+}
+
+enum TypeMessage {
+  image
+  gift
+  text
+  custom
+}
+
+enum Status {
+  pending
+  send
+  unsend
+  received
+  read
+}
+
+model Gift {
+  id            Int    @id @default(autoincrement())
+  nom           String
+  prix          Decimal
+  image         String
+  giftCategory  GiftCategory  @default(unclassified)
+  isAvailable   Boolean @default(true)
+  purchases     Purchase[]
+}
+
+enum GiftCategory {
+  rose
+  mode_beaute
+  fitness_bien_etre
+  cuisine_gastronomie
+  bijoux_accessoires
+  art_creativite
+  musique
+  technologie_gadget
+  litterature_ecriture
+  jardinage
+  jeux_loisirs
+  sextoys
+  unclassified
+}
+
+model Purchase {
+  id                Int               @id @default(autoincrement())
+  gift              Gift              @relation(fields: [giftId], references: [id])
+  giftId            Int
+  qtyPurchased      Int               @default(1)
+  datePurchased     DateTime
+  sender            User              @relation("purchaseSender", fields: [senderId], references: [id])
+  senderId          Int
+  receiver          User              @relation("purchaseReceiver", fields: [receiverId], references: [id])
+  receiverId        Int
+  status            PurchaseStatus    @default(pending)
+  deliveryAddress   String?
+  recipientFullName String?
+}
+
+enum PurchaseStatus {
+  pending
+  processing
+  received
+}
+
+model SocketMapping {
+  id         Int           @id @default(autoincrement())
+  socketId   String        @unique
+  user       User          @relation(fields: [userId], references: [id])
+  userId     Int           @unique
+}
+
+model LockedConversation {
+  id         Int       @id @default(autoincrement())
+  initiator  User      @relation("initiatedLocks", fields: [initiatorId], references: [id])
+  initiatorId Int      
+  receiver   User      @relation("receivedLocks", fields: [receiverId], references: [id])
+  receiverId Int
+
+  @@unique([initiatorId, receiverId])
+}
+
+enum PodiumStatus {
+  NONE
+  COUNTRY
+  WORLD
+}
+
+model Podium {
+  id         Int              @id @default(autoincrement())
+  userId     Int              @unique
+  status     PodiumStatus     @default(NONE)
+  createdAt  DateTime         @default(now())
+
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Country {
+  id         Int              @id @default(autoincrement())
+  name       String           @unique
+  sigle      String           @unique 
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  cartes Carte[]
+}
+
+model City {
+  id         Int              @id @default(autoincrement())
+  name       String           @unique
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  cartes Carte[]
+}
+
+enum SubscriptionStatus {
+  HOTEL
+  RESTAURANT
+  TRANSPORT
+  EVENEMENT
+}
+
+model Subscription {
+  id              Int              @id @default(autoincrement())
+  name            String
+  description     String?
+  status          SubscriptionStatus
+  price           Int
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  subscriptions     CompanySubscription[]   
+}
+
+model Company {
+  id Int @id @default(autoincrement())
+  phoneNumber String @unique
+  username String?  @unique
+  email String?
+  category String?
+  logo String?
+  description String?
+  country String?
+  city String?
+  location String?
+  mapAddress String?
+  solde Int?
+  subscriptionId    Int?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime? @updatedAt
+
+  subscriptions     CompanySubscription[]   
+  cartes     Carte[]   
+}
+
+model CompanySubscription {
+  id                Int              @id @default(autoincrement())
+  companyId         Int
+  subscriptionId    Int
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  company           Company        @relation(fields: [companyId], references: [id])
+  subscription      Subscription        @relation(fields: [subscriptionId], references: [id])
+}
+
+model Carte {
+  id              Int              @id @default(autoincrement())
+  name            String
+  email           String
+  mapAddress      String?
+  description     String?
+  location        String?
+  OpenDaysTime    String
+  countryId       Int
+  cityId          Int
+  image           String
+  companyId       Int
+  typeCarte       SubscriptionStatus
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  country         Country             @relation(fields: [countryId], references: [id])
+  city            City                @relation(fields: [cityId], references: [id])
+  company         Company        @relation(fields: [companyId], references: [id])
+  likes           LikedCarte[]
+  reservations    CarteReservation[]
+  carteOtherPhotos    CarteOthersPhoto[]
+}
+
+model CarteOthersPhoto {
+  id              Int              @id @default(autoincrement())
+  name            String?
+  path_url        String
+  carteId         Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  carte           Carte   @relation(fields: [carteId], references: [id], onDelete: Cascade)
+}
+
+model LikedCarte {
+  id              Int              @id @default(autoincrement())
+  userId          Int              
+  carteId         Int              
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  carte           Carte            @relation(fields: [carteId], references: [id], onDelete: Cascade)
+}
+
+model CarteReservation {
+  id              Int              @id @default(autoincrement())
+  userId          Int
+  carteId         Int   
+  startDate       DateTime
+  endDate         DateTime
+  totalPrice      Int?
+  createdAt       DateTime @default(now())
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  carte           Carte   @relation(fields: [carteId], references: [id], onDelete: Cascade)
+}
