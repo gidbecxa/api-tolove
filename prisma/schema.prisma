@@ -274,7 +274,6 @@ model Company {
   city String?
   location String?
   mapAddress String?
-  solde Int?
   subscriptionId    Int?
   numeroSocial  String?
   solde             Float                 @default(0)
