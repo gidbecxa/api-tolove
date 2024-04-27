@@ -55,7 +55,6 @@ model User {
   reservations      Reservation[]
   sentPurchases     Purchase[]            @relation("purchaseSender")
   receivedPurchases Purchase[]            @relation("purchaseReceiver")
-  reservations      Reservation[]
 
   createdAt         DateTime              @default(now())
 }
