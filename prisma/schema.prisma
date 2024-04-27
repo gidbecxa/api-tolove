@@ -366,13 +366,13 @@ model AnnonceOthersPhoto {
   annonce         Annonce   @relation(fields: [annonceId], references: [id], onDelete: Cascade)
 }
 
-model LikedAnnonce {
-  id              Int              @id @default(autoincrement())
-  userId          Int              
-  annonceId       Int              
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+//  model AnnonceOthersPhoto {
+//  id              Int              @id @default(autoincrement())
+//  name            String?
+//  path_url        String
+//  annonceId       Int
+//  createdAt       DateTime @default(now())
+//  updatedAt       DateTime         @updatedAt
 
-  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  annonce         Annonce          @relation(fields: [annonceId], references: [id], onDelete: Cascade)
-}
+//  annonce         Annonce   @relation(fields: [annonceId], references: [id], onDelete: Cascade)
+//  }
