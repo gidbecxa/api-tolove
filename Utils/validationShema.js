@@ -145,7 +145,7 @@ exports.addNewPhotoCarteSchema = yup.object({
 
 exports.updateCompanySchema = yup.object({
     username: yup.string().required(errorTypeOne),
-    category: yup.string().required().oneOf(["restaurant", "evenement", "cadeau", "hotel"], "Genre invalide"),
+    category: yup.string().required().oneOf(["restaurant", "activités", "cadeau", "hôtel", "transport"], "Genre invalide"),
     // country: yup.string().required(),
     email: yup.string().required(errorTypeOne).email("Email Invalide"),
     city: yup.string().required(errorTypeOne),
