@@ -291,8 +291,8 @@ module.exports = {
                 });
 
                 const companyId = company.id;
-                const accessToken = jwtUtils.generateTokenForUser(user);
-                const refreshToken = jwtUtils.generateRefreshTokenForUser(user);
+                const accessToken = jwtUtils.generateTokenForUser(company);
+                const refreshToken = jwtUtils.generateRefreshTokenForUser(company);
 
                 res.status(201).send({
                     success: true,
