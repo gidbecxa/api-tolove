@@ -51,10 +51,11 @@ model User {
   initiatedLock     LockedConversation[]  @relation("initiatedLocks")
   receivedLock      LockedConversation[]  @relation("receivedLocks")
   podiumUsers       Podium[]
-  carteLikes        LikedCarte[]
-  carteReservations CarteReservation[]
+  annonceLikes      LikedAnnonce[]
+  reservations      Reservation[]
   sentPurchases     Purchase[]            @relation("purchaseSender")
   receivedPurchases Purchase[]            @relation("purchaseReceiver")
+  reservations      Reservation[]
 
   createdAt         DateTime              @default(now())
 }
@@ -150,8 +151,14 @@ model Gift {
   nom           String
   prix          Decimal
   image         String
+  description   String?
   giftCategory  GiftCategory  @default(unclassified)
   isAvailable   Boolean @default(true)
+  createdAt     DateTime @default(now())
+  expiresIn     Int              @default(30)
+  companyId     Int?
+  company       Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
   purchases     Purchase[]
 }
 
@@ -190,6 +197,60 @@ enum PurchaseStatus {
   pending
   processing
   received
+}
+
+model Annonce {
+  id                Int             @id @default(autoincrement())
+  nom               String
+  prix              Decimal
+  image             String
+  description       String?
+  category          AnnonceCategory @default(unclassified)
+  isAvailable       Boolean         @default(true)
+  createdAt         DateTime        @default(now())
+  expiresIn         Int              @default(30)
+  companyId         Int?
+  company           Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  reservations      Reservation[]
+}
+
+enum AnnonceCategory {
+  // RESTAURANT
+  petit_dejeuner
+  dejeuner
+  diner
+  // TRANSPORT
+  compact
+  intermediary
+  berline
+  luxury
+  pickup
+  // HOTEL
+  standard
+  deluxe
+  suite
+  communicante
+  // ACTIVITES
+  diner_romantique
+  cinema
+  promenade
+  musee_galerie
+  spectacle
+  spa
+}
+
+model Reservation {
+  id              Int              @id @default(autoincrement())
+  userId          Int
+  annonceId       Int   
+  startDate       DateTime
+  endDate         DateTime
+  totalPrice      Int?
+  createdAt       DateTime @default(now())
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  annonce         Annonce   @relation(fields: [annonceId], references: [id], onDelete: Cascade)
 }
 
 model SocketMapping {
@@ -231,7 +292,6 @@ model Country {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  cartes Carte[]
 }
 
 model City {
@@ -240,7 +300,6 @@ model City {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  cartes Carte[]
 }
 
 enum SubscriptionStatus {
@@ -263,25 +322,26 @@ model Subscription {
 }
 
 model Company {
-  id Int @id @default(autoincrement())
-  phoneNumber String @unique
-  username String?  @unique
-  email String?
-  category String?
-  logo String?
-  description String?
-  country String?
-  city String?
-  location String?
-  mapAddress String?
-  subscriptionId    Int?
-  numeroSocial  String?
-  solde             Float                 @default(0)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime? @updatedAt
+  id                    Int       @id       @default(autoincrement())
+  phoneNumber           String    @unique
+  username              String?   @unique
+  email                 String?
+  category              String?
+  logo                  String?
+  description           String?
+  country               String?
+  city                  String?
+  location              String?
+  mapAddress            String?
+  subscriptionId        Int?
+  numeroSocial          String?
+  solde                 Float     @default(0)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime? @updatedAt
 
-  subscriptions     CompanySubscription[]   
-  cartes     Carte[]   
+  subscriptions         CompanySubscription[] 
+  annonces              Annonce[]
+  gifts                 Gift[]
 }
 
 model CompanySubscription {
@@ -295,61 +355,24 @@ model CompanySubscription {
   subscription      Subscription        @relation(fields: [subscriptionId], references: [id])
 }
 
-model Carte {
-  id              Int              @id @default(autoincrement())
-  name            String
-  email           String
-  mapAddress      String?
-  description     String?
-  location        String?
-  OpenDaysTime    String
-  countryId       Int
-  cityId          Int
-  image           String
-  companyId       Int
-  typeCarte       SubscriptionStatus
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
-  country         Country             @relation(fields: [countryId], references: [id])
-  city            City                @relation(fields: [cityId], references: [id])
-  company         Company        @relation(fields: [companyId], references: [id])
-  likes           LikedCarte[]
-  reservations    CarteReservation[]
-  carteOtherPhotos    CarteOthersPhoto[]
-}
-
-model CarteOthersPhoto {
+model AnnonceOthersPhoto {
   id              Int              @id @default(autoincrement())
   name            String?
   path_url        String
-  carteId         Int
+  annonceId       Int
   createdAt       DateTime @default(now())
   updatedAt       DateTime         @updatedAt
 
-  carte           Carte   @relation(fields: [carteId], references: [id], onDelete: Cascade)
+  annonce         Annonce   @relation(fields: [annonceId], references: [id], onDelete: Cascade)
 }
 
-model LikedCarte {
+model LikedAnnonce {
   id              Int              @id @default(autoincrement())
   userId          Int              
-  carteId         Int              
+  annonceId       Int              
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
   user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  carte           Carte            @relation(fields: [carteId], references: [id], onDelete: Cascade)
-}
-
-model CarteReservation {
-  id              Int              @id @default(autoincrement())
-  userId          Int
-  carteId         Int   
-  startDate       DateTime
-  endDate         DateTime
-  totalPrice      Int?
-  createdAt       DateTime @default(now())
-
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  carte           Carte   @relation(fields: [carteId], references: [id], onDelete: Cascade)
+  annonce         Annonce          @relation(fields: [annonceId], references: [id], onDelete: Cascade)
 }
