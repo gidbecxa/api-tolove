@@ -377,7 +377,7 @@ module.exports = {
 
         try {
             const uploadParams = {
-                Bucket: 'company.dmvision-bucket',
+                Bucket: 'user.dmvision-bucket',
                 Key: `company${id}/${filename}`,
                 Body: fs.createReadStream(path),
                 ContentType: file.mimetype
