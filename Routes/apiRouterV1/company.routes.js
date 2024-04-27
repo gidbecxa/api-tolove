@@ -24,7 +24,7 @@ module.exports = (apiRouter) => {
     
     // put routes
     // apiRouter.route('/company/update/profileLogo/:id').put(authMiddleware, upload.single('image'), companyCtrl.updatePicture);
-    apiRouter.route('/company/update/upload-logo-description').put(upload.single('image'), companyCtrl.updateProfilLastData);
+    apiRouter.route('/company/update/logo-description/').put(upload.single('image'), companyCtrl.updateProfilLastData);
     apiRouter.route('/company/update/profile').put(ValidatorMiddlewares(updateCompanySchema), companyMiddleware, companyCtrl.updateProfile);
 
     apiRouter.route('/company/update/first-step/').put(ValidatorMiddlewares(updateCompanySchema), companyMiddleware, companyCtrl.updateFirstProfileData);
