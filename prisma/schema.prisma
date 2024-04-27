@@ -215,6 +215,7 @@ model Annonce {
 }
 
 enum AnnonceCategory {
+  unclassified
   // RESTAURANT
   petit_dejeuner
   dejeuner
