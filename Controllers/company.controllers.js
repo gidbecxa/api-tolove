@@ -311,7 +311,32 @@ module.exports = {
 
     },
 
-    updateProfilNext: async (req, res) => {
+    updateFirstProfileData: async (req, res) => {
+        const { id } = req.company;
+        // console.log('id: ', id);
+        const { username, category, email, city, numeroSocial, } = req.body;
+        console.log('Request body ', req.body);
+
+        try {
+            const user = await prisma.company.update({
+                where: { id: parseInt(id) },
+                data: {
+                    username: username,
+                    category: category,
+                    email: email,
+                    city: city,
+                    numeroSocial: numeroSocial,
+                },
+            });
+
+            res.status(200).json({ success: true, user })
+        } catch (error) {
+            console.error("Error updating user: ", error);
+            res.status(500).json({ success: false, error: "Failed to update user" })
+        }
+    },
+
+    updateProfilLastData: async (req, res) => {
         const { id } = req.company;
         console.log('Update data step 2 for company ', id);
         // console.log('Request body ', req.body);

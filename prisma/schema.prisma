@@ -276,6 +276,7 @@ model Company {
   mapAddress String?
   solde Int?
   subscriptionId    Int?
+  numeroSocial  String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime? @updatedAt
 
