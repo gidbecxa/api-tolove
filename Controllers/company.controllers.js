@@ -336,6 +336,32 @@ module.exports = {
         }
     },
 
+    updateSolde: async function (req, res) {
+
+        const { id } = req.params;
+        const { solde } = req.body;
+        console.log('Body:', req.body);
+
+        prisma.user.update({
+            where: {
+                id: parseInt(id),
+            },
+            data: {
+                solde: solde,
+            },
+        })
+            .then(() => {
+                res.status(200).send({
+                    message: 'Coins was updated successfully',
+                })
+            })
+            .catch((error) => {
+                res.status(500).send({
+                    message: error.message || `Some error occurred while updating the coins with id=${id}`,
+                })
+            })
+    },
+
     updateProfilLastData: async (req, res) => {
         const { id } = req.company;
         console.log('Update data step 2 for company ', id);
