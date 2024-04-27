@@ -138,11 +138,11 @@ module.exports = {
                         { location: inputvalue, },
                     ],
                 },
-                orderBy: {createdAt: 'desc'}
+                orderBy: { createdAt: 'desc' }
             })
 
             res.json({ data });
-            
+
         } catch (error) {
             console.error('Error occurred while querying cartes table:', error);
             res.status(500).json({ error: 'An error occurred' });
@@ -150,130 +150,106 @@ module.exports = {
 
     },
 
-    addCarte: async function (req, res) {
-        const { name, email, mapAddress, description, location, OpenDaysTime, countryId, cityId, typeCarte, companyId } = req.body;
-        console.log("Attempting to add carte:", { name, email, mapAddress, description, location, OpenDaysTime, countryId, cityId, typeCarte, companyId });
+    createAnnonce: async (req, res) => {
+        console.log("Creating new annonce...");
+        console.log("New gift details:", req.body);
 
-         // Check if current company has the appropriated Subscription to add this Carte
-         const checking = await prisma.companySubscription.findFirst({
-            where: {
-                companyId: companyId,
-                subscription: { status: typeCarte },
-            },
-        });
+        const { nom, prix, category, description, points } = req.body;
+        const { id } = req.company;
 
-        if (!checking) {
-            return res.status(422).send({ success: false, msg: 'Sorry, this Company don\'t have access the current Subscription' });
-        }
-
+        // Handle image upload to S3
         if (!req.file) {
-            return res.status(400).json({ error: 'No file uploaded' });
+            res.status(400).json({ error: 'No file uploaded' });
         }
 
         const file = req.file;
         const { filename, path } = file;
 
         try {
-
+            // const randomString = Math.random().toString(36).substring(2, 15) /** + Math.random().toString(36).substring(2, 15)*/;
             const uploadParams = {
-                Bucket: 'carte.toloveapp-storage',
-                Key: `carte${companyId}/${filename}`,
+                Bucket: 'annonce.dmvision-bucket',
+                Key: `annonces/${filename}`,
                 Body: fs.createReadStream(path),
-                ContentType: file.mimetype
+                ContentType: file.mimetype,
             };
 
             try {
                 const uploadResponse = await myS3Client.send(new PutObjectCommand(uploadParams));
-                console.log(
-                    "Successfully created " +
-                    uploadParams.Key +
-                    " and uploaded it to " +
-                    uploadParams.Bucket +
-                    "/" + uploadParams.Key
-                );
+                console.log(`Successfully uploaded Gift image to S3: ${uploadParams.Key}`);
             } catch (err) {
-                console.log("Error", err);
+                console.error('Error uploading Gift image to S3:', err);
+                res.status(500).json({ error: 'Error uploading Gift image to S3' });
             }
 
             const imageUrl = `https://s3.eu-west-2.amazonaws.com/${uploadParams.Bucket}/${uploadParams.Key}`;
 
-            // Create a new carte in the database
-            const newCarte = await prisma.carte.create({
+            // Creating the gift in the DB
+            const newAnnonce = await prisma.annonce.create({
                 data: {
-                    name: name,
-                    email: email,
+                    nom: nom,
+                    category: category,
                     description: description,
-                    location: location,
-                    OpenDaysTime: OpenDaysTime,
-                    countryId: countryId,
-                    cityId: cityId,
+                    prix: parseFloat(prix),
+                    points: parseFloat(points),
                     image: imageUrl,
-                    typeCarte: typeCarte,
-                    companyId: companyId,
+                    companyId: id,
                 },
             });
 
-            return res.status(201).send({ success: true, msg: 'Carte has been added successfully', carte: newCarte });
+            console.log("Annonce successfully created", newAnnonce);
+            res.status(200).json({ success: true, newAnnonce });
         } catch (error) {
-            console.error('Error while adding carte:', error);
-            res.status(500).json({ success: false, error: "Failed to add carte" });
+            console.error('Error creating annonce:', error);
+            res.status(500).json({ error: 'Failed to create annonce' }); // Internal server error
         }
     },
 
-    updateCarte: async (req, res) => {
-
-        const { id } = req.params;
-        const { name, email, mapAddress, description, location, OpenDaysTime, countryId, cityId, typeCarte } = req.body;
-
-        if (!req.file) {
-            return res.status(400).json({ error: 'No file uploaded', msg: 'No file uploaded'  });
-        }
-
-        const file = req.file;
-        const { filename, path } = file;
-
+    getAllAnnoncesByCompany: async (req, res) => {
+        console.log("Getting all annonces for this company...");
         try {
-            const uploadParams = {
-                Bucket: 'carte.toloveapp-storage',
-                Key: `carte${id}/${filename}`,
-                Body: fs.createReadStream(path),
-                ContentType: file.mimetype
-            };
+            const { id } = req.company;
+            const limit = parseInt(req.query.limit) || 10;
+            const page = parseInt(req.query.page) || 1;
 
-            try {
-                const uploadResponse = await myS3Client.send(new PutObjectCommand(uploadParams));
-                console.log(
-                    "Successfully created " +
-                    uploadParams.Key +
-                    " and uploaded it to " +
-                    uploadParams.Bucket +
-                    "/" + uploadParams.Key
-                );
-            } catch (err) {
-                console.log("Error", err);
-            }
+            const offset = (page - 1) * limit;
 
-            const imageUrl = `https://s3.eu-west-2.amazonaws.com/${uploadParams.Bucket}/${uploadParams.Key}`;
+            const annonces = await prisma.annonce.findMany({
+                where: {
+                    companyId: id,
+                },
+                include: {
+                    company: true,
+                    reservations: true,
+                    likes: true,
+                },
+                orderBy: {
+                    createdAt: 'desc',
+                },
+                skip: offset,
+                take: limit,
+            });
 
-            const carte = await prisma.carte.update({
-                where: { id: parseInt(id) },
-                data: {
-                    name: name,
-                    email: email,
-                    description: description,
-                    location: location,
-                    OpenDaysTime: OpenDaysTime,
-                    countryId: countryId,
-                    cityId: cityId,
-                    image: imageUrl,
-                    typeCarte: typeCarte,
+            // Total number of annonces associated with the company
+            const totalAnnonces = await prisma.annonce.count({
+                where: {
+                    companyId: id,
                 },
             });
 
-            res.status(200).json({ success: true, carte })
+            // Total number of pages
+            const totalPages = Math.ceil(totalAnnonces / limit);
+
+            return res.status(200).json({
+                success: true,
+                annonces: annonces,
+                currentPage: page,
+                totalPages: totalPages,
+                totalAnnonces: totalAnnonces,
+            });
         } catch (error) {
-            console.error("Error updating carte infos: ", error);
-            res.status(500).json({ success: false, error: "Failed to update carte infos" })
+            console.error('Error retrieving annonces for this company:', error);
+            return res.status(500).json({ error: 'Failed to retrieve annonces for the company' });
         }
     },
 
@@ -286,7 +262,7 @@ module.exports = {
                     id: parseInt(id),
                 },
             })
-            
+
             const statusCode = deleteCarte ? 200 : 404;
             const response = deleteCarte || { message: `Cannot delete carte with id = ${id}` };
             res.status(statusCode).send(response);
@@ -400,7 +376,7 @@ module.exports = {
                     carteId: carteId,
                 },
             });
-    
+
             const updateCarteLikes = await prisma.carte.update({
                 where: {
                     id: carteId
@@ -421,7 +397,7 @@ module.exports = {
             res.status(500).json({ success: false, error: "Failed to add carte like" });
         }
     },
-      
+
     unLikeCarte: async function (req, res) {
         const { userId, carteId } = req.body;
         console.log("Attempting to unlike carte:", { userId, carteId });
@@ -446,7 +422,7 @@ module.exports = {
                     carteId: parseInt(carteId),
                 },
             })
-    
+
             prisma
                 .$transaction([removeLike])
                 .then(() => {
@@ -465,7 +441,7 @@ module.exports = {
             res.status(500).json({ success: false, error: "Failed to remove carte like" });
         }
     },
-    
+
     checkCarteLike: async (req, res) => {
         // CHECKING
         const { userId, carteId } = req.body;
@@ -486,14 +462,14 @@ module.exports = {
             let statusCode;
             let response;
 
-            if(checking) {
+            if (checking) {
                 statusCode = 201;
                 response = { success: true, msg: 'This carte is been liked by this user', checking: true };
             } else {
                 statusCode = 500;
                 response = { message: `This user never like this carte` };
             }
-            
+
             // RETURN THE APROPRIATED RESPONSE
             return res.status(statusCode).send(response);
 
@@ -533,7 +509,7 @@ module.exports = {
                     endDate: endDate
                 },
             });
-        
+
             const updateCarteReservations = await prisma.carte.update({
                 where: {
                     id: carteId
@@ -558,10 +534,10 @@ module.exports = {
     },
 
     skipReservation: async (req, res) => {
-        
+
         const { userId, carteId } = req.body;
         console.log("Attempting to skip reservation carte:", { userId, carteId });
-        
+
         try {
 
             // Skip a carte reservation entry from the database
@@ -571,7 +547,7 @@ module.exports = {
                     carte: { userId: parseInt(userId) }
                 },
             })
-    
+
             prisma
                 .$transaction([reservationSkip])
                 .then(() => {

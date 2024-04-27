@@ -149,6 +149,7 @@ model Gift {
   id            Int    @id @default(autoincrement())
   nom           String
   prix          Decimal
+  points        Decimal         @default(1)
   image         String
   description   String?
   giftCategory  GiftCategory  @default(unclassified)
@@ -202,6 +203,7 @@ model Annonce {
   id                Int             @id @default(autoincrement())
   nom               String
   prix              Decimal
+  points            Decimal         @default(1)
   image             String
   description       String?
   category          AnnonceCategory @default(unclassified)
