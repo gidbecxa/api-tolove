@@ -53,7 +53,7 @@ module.exports = {
 
     getMe: async (req, res) => {
 
-        let { isFake, isOnline, ...mics } = req.company;
+        let { isOnline, ...mics } = req.company;
 
         res.status(200).send({
             success: true,
