@@ -156,7 +156,7 @@ model Gift {
   createdAt     DateTime @default(now())
   expiresIn     Int              @default(30)
   companyId     Int?
-  company       Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company       Company?         @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   purchases     Purchase[]
 }
@@ -207,11 +207,12 @@ model Annonce {
   category          AnnonceCategory @default(unclassified)
   isAvailable       Boolean         @default(true)
   createdAt         DateTime        @default(now())
-  expiresIn         Int              @default(30)
+  expiresIn     Int              @default(30)
   companyId         Int?
-  company           Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company           Company?         @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   reservations      Reservation[]
+  likes             LikedAnnonce[]
 }
 
 enum AnnonceCategory {
@@ -251,6 +252,17 @@ model Reservation {
 
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   annonce         Annonce   @relation(fields: [annonceId], references: [id], onDelete: Cascade)
+}
+
+model LikedAnnonce {
+  id              Int              @id @default(autoincrement())
+  userId          Int              
+  annonceId       Int              
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  annonce         Annonce          @relation(fields: [annonceId], references: [id], onDelete: Cascade)
 }
 
 model SocketMapping {
@@ -353,17 +365,6 @@ model CompanySubscription {
   
   company           Company        @relation(fields: [companyId], references: [id])
   subscription      Subscription        @relation(fields: [subscriptionId], references: [id])
-}
-
-model AnnonceOthersPhoto {
-  id              Int              @id @default(autoincrement())
-  name            String?
-  path_url        String
-  annonceId       Int
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime         @updatedAt
-
-  annonce         Annonce   @relation(fields: [annonceId], references: [id], onDelete: Cascade)
 }
 
 //  model AnnonceOthersPhoto {
