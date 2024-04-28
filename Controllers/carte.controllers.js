@@ -159,7 +159,7 @@ module.exports = {
 
         // Handle image upload to S3
         if (!req.file) {
-            res.status(400).json({ error: 'No file uploaded' });
+            return res.status(400).json({ error: 'No file uploaded' });
         }
 
         const file = req.file;
@@ -176,10 +176,10 @@ module.exports = {
 
             try {
                 const uploadResponse = await myS3Client.send(new PutObjectCommand(uploadParams));
-                console.log(`Successfully uploaded Gift image to S3: ${uploadParams.Key}`);
+                console.log(`Successfully uploaded Annonce image to S3: ${uploadParams.Key}`);
             } catch (err) {
-                console.error('Error uploading Gift image to S3:', err);
-                res.status(500).json({ error: 'Error uploading Gift image to S3' });
+                console.error('Error uploading Annonce image to S3:', err);
+                return res.status(500).json({ error: 'Error uploading Gift image to S3' });
             }
 
             const imageUrl = `https://s3.eu-west-2.amazonaws.com/${uploadParams.Bucket}/${uploadParams.Key}`;
@@ -198,10 +198,10 @@ module.exports = {
             });
 
             console.log("Annonce successfully created", newAnnonce);
-            res.status(200).json({ success: true, newAnnonce });
+            return res.status(200).json({ success: true, newAnnonce });
         } catch (error) {
             console.error('Error creating annonce:', error);
-            res.status(500).json({ error: 'Failed to create annonce' }); // Internal server error
+            return res.status(500).json({ error: 'Failed to create annonce' }); // Internal server error
         }
     },
 
