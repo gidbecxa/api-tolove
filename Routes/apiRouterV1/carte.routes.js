@@ -16,7 +16,7 @@ module.exports = (apiRouter) => {
     // apiRouter.route('/carte/getCarteOtherPhotos/:id').get(authMiddleware, carteCtrl.getCarteOtherPhotos);
 
     // post routes
-    apiRouter.route('/annonce/create-annonce').post(authMiddleware, carteCtrl.createAnnonce);
+    apiRouter.route('/annonce/create-annonce').post(authMiddleware, upload.single('image'), carteCtrl.createAnnonce);
 
     // apiRouter.route('/carte/searchCarte').post(carteCtrl.searchCarte);
     // apiRouter.route('/carte/addCarte').post(ValidatorMiddlewares(addCarteSchema), authMiddleware, carteCtrl.addCarte);
@@ -26,7 +26,7 @@ module.exports = (apiRouter) => {
     // apiRouter.route('/carte/makeReservation').post(authMiddleware, carteCtrl.makeReservation);
     // apiRouter.route('/carte/skipReservation').post(authMiddleware, carteCtrl.skipReservation);
     // apiRouter.route('/carte/addNewPhotoCarte').post(ValidatorMiddlewares(addNewPhotoCarteSchema), authMiddleware, carteCtrl.addNewPhotoCarte);
-    
+
     // put routes
     // apiRouter.route('/carte/updateCarte/:id').put(ValidatorMiddlewares(updateCarteSchema), authMiddleware, carteCtrl.updateCarte);
 };
