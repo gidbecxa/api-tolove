@@ -1,6 +1,6 @@
 // Imports
 const carteCtrl = require('../../Controllers/carte.controllers');
-const { authMiddleware } = require('../../Middlewares/jwtauth.middlewares');
+const { authMiddleware, companyMiddleware } = require('../../Middlewares/jwtauth.middlewares');
 const { ValidatorMiddlewares } = require('../../Middlewares/validator.middlewares');
 const {
     addCarteSchema, updateCarteSchema, likeCarteSchema, unLikeCarteSchema, addNewPhotoCarteSchema
@@ -9,7 +9,7 @@ const { upload } = require('../../multerConfig');
 
 module.exports = (apiRouter) => {
     // get routes
-    apiRouter.route('/carte/company/get-all-annonces').get(authMiddleware, carteCtrl.getAllAnnoncesByCompany);
+    apiRouter.route('/carte/company/get-all-annonces').get(companyMiddleware, carteCtrl.getAllAnnoncesByCompany);
 
     // apiRouter.route('/carte/getAll/').get(authMiddleware, carteCtrl.getAll);
     // apiRouter.route('/carte/getOne/:id').get(authMiddleware, carteCtrl.getOne);
@@ -17,7 +17,7 @@ module.exports = (apiRouter) => {
     // apiRouter.route('/carte/getCarteOtherPhotos/:id').get(authMiddleware, carteCtrl.getCarteOtherPhotos);
 
     // post routes
-    apiRouter.route('/annonce/create-annonce').post(authMiddleware, upload.single('image'), carteCtrl.createAnnonce);
+    apiRouter.route('/annonce/create-annonce').post(companyMiddleware, upload.single('image'), carteCtrl.createAnnonce);
 
     // apiRouter.route('/carte/searchCarte').post(carteCtrl.searchCarte);
     // apiRouter.route('/carte/addCarte').post(ValidatorMiddlewares(addCarteSchema), authMiddleware, carteCtrl.addCarte);
