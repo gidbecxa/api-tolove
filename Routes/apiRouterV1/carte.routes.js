@@ -5,6 +5,7 @@ const { ValidatorMiddlewares } = require('../../Middlewares/validator.middleware
 const {
     addCarteSchema, updateCarteSchema, likeCarteSchema, unLikeCarteSchema, addNewPhotoCarteSchema
 } = require('../../Utils/validationShema');
+const { upload } = require('../../multerConfig');
 
 module.exports = (apiRouter) => {
     // get routes
