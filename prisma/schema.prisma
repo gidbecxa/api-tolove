@@ -382,7 +382,7 @@ model CompanySubscription {
 
 model AccountDelete {
   id                Int              @id @default(autoincrement())
-  userId
+  userId            Int
   createdAt         DateTime @default(now())
   description       String?
   status            PurchaseStatus    @default(pending)
