@@ -59,4 +59,5 @@ module.exports = (apiRouter) => {
     apiRouter.route('/chatrooms/getchatroom/by-participants').post(authMiddleware, usersCtrl.getChatRoomIdForUsers);
     apiRouter.route('/gifts/create-gift').post(authMiddleware, upload.single('image'), usersCtrl.createGift);
     apiRouter.route('/purchase/new-purchase').post(authMiddleware, usersCtrl.createPurchase);
+    apiRouter.route('/delete-account').post(authMiddleware, usersCtrl.requestAccountDelete);
 };

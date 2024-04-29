@@ -379,3 +379,16 @@ model CompanySubscription {
 
 //  annonce         Annonce   @relation(fields: [annonceId], references: [id], onDelete: Cascade)
 //  }
+
+model AccountDelete {
+  id                Int              @id @default(autoincrement())
+  userId
+  createdAt         DateTime @default(now())
+  description       String?
+  status            PurchaseStatus    @default(pending)
+}
+
+enum AccountDeleteStatus {
+  pending
+  deleted
+}

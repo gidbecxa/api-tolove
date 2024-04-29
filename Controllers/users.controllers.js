@@ -1439,4 +1439,23 @@ module.exports = {
         }
     },
 
+    requestAccountDelete: async (req, res) => {
+        try {
+            const { userId, description } = req.body;
+
+            const newDeleteRequest = await prisma.accountDelete.create({
+                data: {
+                    userId: parseInt(userId),
+                    description: description,
+                    // status: 'pending',
+                },
+            });
+
+            return res.status(200).json({ success: true, newDeleteRequest });
+        } catch (error) {
+            console.error('Error registering account deletion request:', error);
+            res.status(500).json({ success: false, message: 'Failed to register account deletion request.' });
+        }
+    }
+
 }
