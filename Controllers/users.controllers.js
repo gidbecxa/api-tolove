@@ -35,6 +35,7 @@ module.exports = {
                 },
                 role: 'USER',
                 genre: preference,
+                isCertified: true,
                 to: {
                     // to get profiles that the user hasn't matched with
                     none: {
@@ -351,6 +352,7 @@ module.exports = {
                 );
             } catch (err) {
                 console.log("Error", err);
+                return;
             }
 
             const imageUrl = `https://s3.eu-west-2.amazonaws.com/${uploadParams.Bucket}/${uploadParams.Key}`;
