@@ -2,6 +2,7 @@ const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient();
 const { PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
 const { myS3Client } = require('../Utils/s3Client');
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const fs = require('fs');
 
 module.exports = {
