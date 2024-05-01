@@ -253,6 +253,39 @@ module.exports = {
         }
     },
 
+    getPresignedUrl: async (req, res) => {
+        const { photoURL } = req.body;
+        console.log('URL for presignedURL: ', photoURL);
+
+        // Determine the bucket dynamically
+        const bucketPrefix = photoURL.includes('annonce.dmvision-bucket') ? 'annonce.dmvision-bucket' : 'user.dmvision-bucket';
+
+        const objectParams = {
+            Bucket: bucketPrefix,
+            Key: photoURL.replace(`https://s3.eu-west-2.amazonaws.com/${bucketPrefix}/`, ''),
+        }
+
+        const expirationTime = 60 * 60 * 12;
+        const createPresignedUrlWithClient = () => {
+            const client = myS3Client;
+            const command = new GetObjectCommand(objectParams);
+            return getSignedUrl(client, command, { expiresIn: expirationTime });
+        }
+
+        try {
+            const photoPresignedURL = await createPresignedUrlWithClient({
+                // region: objectParams.Region,
+                bucket: objectParams.Bucket,
+                key: objectParams.Key
+            });
+            // console.log("Presigned URL with client", photoPresignedURL);
+
+            res.status(200).json({ success: true, url: photoPresignedURL });
+        } catch (error) {
+            console.error(error);
+        }
+    },
+
     deleteCarte: async (req, res) => {
 
         const { id } = req.params

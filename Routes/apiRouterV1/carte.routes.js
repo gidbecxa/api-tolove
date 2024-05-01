@@ -18,6 +18,7 @@ module.exports = (apiRouter) => {
 
     // post routes
     apiRouter.route('/annonce/create-annonce').post(companyMiddleware, upload.single('image'), carteCtrl.createAnnonce);
+    apiRouter.route('/annonce/photos/presigned-url').post(carteCtrl.getPresignedUrl);
 
     // apiRouter.route('/carte/searchCarte').post(carteCtrl.searchCarte);
     // apiRouter.route('/carte/addCarte').post(ValidatorMiddlewares(addCarteSchema), authMiddleware, carteCtrl.addCarte);
