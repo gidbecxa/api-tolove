@@ -7,71 +7,55 @@ const fs = require('fs');
 
 module.exports = {
     getAll: async (req, res) => {
-        console.log(`Query: limit: ${req.query.limit}, page: ${req.query.page}`);
-        const limit = parseInt(req.query.limit) || 3;
-        const page = parseInt(req.query.page) || 0;
-
         try {
-            const totalRows = await prisma.carte.count();
-
-            const cartes = await prisma.carte.findMany({
-                skip: limit * page,
-                take: limit,
+            const annonces = await prisma.annonce.findMany({
+                where: {
+                    company: {
+                        category: 'transport' // Filter annonces based on company category
+                    }
+                },
                 select: {
                     id: true,
-                    name: true,
-                    email: true,
-                    mapAddress: true,
-                    description: true,
-                    location: true,
-                    OpenDaysTime: true,
-                    countryId: true,
-                    cityId: true,
+                    nom: true,
+                    prix: true,
+                    points: true,
                     image: true,
-                    country: {
-                        select: {
-                            name: true,
-                            sigle: true,
-                        }
-                    },
-                    city: {
-                        select: {
-                            name: true,
-                        }
-                    },
-                    typeCarte: true,
-                    companyId: true,
+                    description: true,
+                    isAvailable: true,
                     company: {
                         select: {
-                            username: true,
+                            id: true,
                             phoneNumber: true,
+                            username: true,
+                            email: true,
                             logo: true,
-                            mapAddress: true,
+                            country: true,
+                            city: true,
                         }
                     },
-                    createdAt: true,
-                    updatedAt: true,
-                },
-                orderBy: {
-                    id: 'desc',
-                },
+                    likes: {
+                        select: {
+                            id: true,
+                            userId: true,
+                            createdAt: true,
+                            user: {
+                                select: {
+                                    id: true,
+                                    // other user fields ...
+                                }
+                            }
+                        }
+                    }
+                }
             });
 
-            const totalPage = Math.ceil(totalRows / limit);
-
-            res.status(200).json({
-                result: cartes,
-                page: page,
-                limit: limit,
-                totalRows: totalRows,
-                totalPage: totalPage
-            });
+            res.status(200).json({ annonces });
         } catch (error) {
-            res.status(500).send({
-                message: error.message || `An error occurred`,
-            });
+            console.error('Error fetching annonces:', error);
+            res.status(500).json({ error: 'An error occurred while fetching annonces' });
         }
     },
+
 
     getOne: async (req, res) => {
         try {
