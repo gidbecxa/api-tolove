@@ -7,11 +7,13 @@ const fs = require('fs');
 
 module.exports = {
     getAll: async (req, res) => {
+        const { category } = req.body;
+
         try {
             const annonces = await prisma.annonce.findMany({
                 where: {
                     company: {
-                        category: 'transport' // Filter annonces based on company category
+                        category: category // Filter annonces based on company category
                     }
                 },
                 select: {
