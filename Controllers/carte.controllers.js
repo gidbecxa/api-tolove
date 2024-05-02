@@ -7,7 +7,7 @@ const fs = require('fs');
 
 module.exports = {
     getAll: async (req, res) => {
-        const { category } = req.body;
+        const { category } = req.params;
 
         try {
             const annonces = await prisma.annonce.findMany({
