@@ -24,6 +24,7 @@ module.exports = {
                     image: true,
                     description: true,
                     isAvailable: true,
+                    category: true,
                     /* company: {
                         select: {
                             id: true,
