@@ -249,7 +249,7 @@ model Reservation {
   annonceId       Int   
   startDate       DateTime
   endDate         DateTime
-  totalPrice      Int?
+  totalPrice      Decimal?
   quantity        Int              @default(1)
   createdAt       DateTime @default(now())
 

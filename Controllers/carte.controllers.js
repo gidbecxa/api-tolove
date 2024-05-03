@@ -273,6 +273,36 @@ module.exports = {
         }
     },
 
+    makeReservation: async (req, res) => {
+        try {
+            console.log("Making new reservation...");
+            console.log("New reservation details:", req.body);
+
+            const { annonceId, quantity, userId } = req.body;
+
+            // Calculate the endDate (30 days from startDate)
+            const startDate = new Date();
+            const endDate = new Date(startDate);
+            endDate.setDate(endDate.getDate() + 30);
+
+            const newReservation = await prisma.reservation.create({
+                data: {
+                    annonce: { connect: { id: parseInt(annonceId) } },
+                    quantity: parseInt(quantity),
+                    startDate: new Date(),
+                    endDate: endDate,
+                    user: { connect: { id: parseInt(userId) } },
+                },
+            });
+
+            console.log("Purchase successfully created", newReservation);
+            res.status(200).json({ success: true, newReservation });
+        } catch (error) {
+            console.error('Error creating purchase:', error);
+            res.status(500).json({ error: 'Failed to create purchase' });
+        }
+    },
+
     deleteCarte: async (req, res) => {
 
         const { id } = req.params
@@ -500,7 +530,7 @@ module.exports = {
         }
     },
 
-    makeReservation: async (req, res) => {
+    /* makeReservation: async (req, res) => {
 
         const { userId, carteId, startDate, endDate } = req.body;
         console.log("Attempting to make reservation carte:", { userId, carteId, startDate, endDate });
@@ -551,7 +581,7 @@ module.exports = {
             console.error('Error while reserving the carte:', error);
             res.status(500).json({ success: false, error: "Failed to make carte reservation" });
         }
-    },
+    }, */
 
     skipReservation: async (req, res) => {
 
