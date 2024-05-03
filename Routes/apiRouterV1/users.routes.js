@@ -29,7 +29,7 @@ module.exports = (apiRouter) => {
 
     apiRouter.route('/chatrooms/messagesNotReadCount/:chatroomId').get(authMiddleware, usersCtrl.getAllChatroomMessagesNotReadCount);
 
-    apiRouter.route('/company/get-companies-annonces/').get(authMiddleware, companyCtrl.getCompaniesAnnonces);
+    apiRouter.route('/company/get-companies-annonces/:category').get(authMiddleware, companyCtrl.getCompaniesAnnonces);
     
     apiRouter.route('/chatrooms/last-message/:chatroomId').get(authMiddleware, usersCtrl.getLastMessage);
     apiRouter.route('/users/get-profile-photo/:id').get(authMiddleware, usersCtrl.getProfilePhoto);

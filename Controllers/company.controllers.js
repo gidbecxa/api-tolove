@@ -55,11 +55,19 @@ module.exports = {
         console.log(`Query: limit: ${req.query.limit}, page: ${req.query.page}`);
         const limit = parseInt(req.query.limit) || 8;
         const page = parseInt(req.query.page) || 0;
+        const { category } = req.params;
 
         try {
-            const totalRows = await prisma.company.count();
+            const totalRows = await prisma.company.count({
+                where: {
+                    category: category,
+                }
+            });
 
             const companies = await prisma.company.findMany({
+                where: {
+                    category: category
+                },
                 skip: limit * page,
                 take: limit,
                 select: {
