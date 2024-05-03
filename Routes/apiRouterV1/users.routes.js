@@ -2,6 +2,7 @@
 const usersCtrl = require('../../Controllers/users.controllers');
 const twilioCtrl = require('../../Controllers/twilio.controller');
 const stripeCtrl = require('../../Controllers/stripe.controller');
+const companyCtrl = require('../../Controllers/company.controllers');
 const { authMiddleware } = require('../../Middlewares/jwtauth.middlewares');
 const { ValidatorMiddlewares } = require('../../Middlewares/validator.middlewares');
 
@@ -27,6 +28,8 @@ module.exports = (apiRouter) => {
     apiRouter.route('/chatrooms/messages/:chatroomId').get(authMiddleware, usersCtrl.getAllChatroomMessages);
 
     apiRouter.route('/chatrooms/messagesNotReadCount/:chatroomId').get(authMiddleware, usersCtrl.getAllChatroomMessagesNotReadCount);
+
+    apiRouter.route('/company/get-companies-annonces/').get(authMiddleware, companyCtrl.getCompaniesAnnonces);
     
     apiRouter.route('/chatrooms/last-message/:chatroomId').get(authMiddleware, usersCtrl.getLastMessage);
     apiRouter.route('/users/get-profile-photo/:id').get(authMiddleware, usersCtrl.getProfilePhoto);

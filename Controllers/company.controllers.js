@@ -51,6 +51,68 @@ module.exports = {
         }
     },
 
+    getCompaniesAnnonces: async (req, res) => {
+        console.log(`Query: limit: ${req.query.limit}, page: ${req.query.page}`);
+        const limit = parseInt(req.query.limit) || 8;
+        const page = parseInt(req.query.page) || 0;
+
+        try {
+            const totalRows = await prisma.company.count();
+
+            const companies = await prisma.company.findMany({
+                skip: limit * page,
+                take: limit,
+                select: {
+                    id: true,
+                    phoneNumber: true,
+                    username: true,
+                    email: true,
+                    category: true,
+                    logo: true,
+                    description: true,
+                    country: true,
+                    city: true,
+                    // location: true,
+                    // mapAddress: true,
+                    // subscriptionId: true,
+                    annonces: {
+                        select: {
+                            id: true,
+                            nom: true,
+                            prix: true,
+                            points: true,
+                            image: true,
+                            description: true,
+                            category: true,
+                            isAvailable: true,
+                            createdAt: true,
+                            expiresIn: true,
+                            companyId: true,
+                        },
+                    },
+                },
+                orderBy: {
+                    id: 'desc',
+                },
+            });
+
+            const totalPage = Math.ceil(totalRows / limit);
+
+            res.status(200).json({
+                result: companies,
+                page: page,
+                limit: limit,
+                totalRows: totalRows,
+                totalPage: totalPage,
+            });
+        } catch (error) {
+            res.status(500).send({
+                message: error.message || 'Some error occurred while retrieving companies',
+            });
+        }
+    },
+
+
     getMe: async (req, res) => {
 
         let { isOnline, ...mics } = req.company;
@@ -210,7 +272,7 @@ module.exports = {
         // const { verificationCode: code } = req.body;
         const { code, phoneNumber, pays } = req.body;
         console.log(code, phoneNumber);
-        
+
         if (code === '001089') {
             console.log('Attempting to create company...');
             try {
