@@ -24,7 +24,7 @@ module.exports = {
                     image: true,
                     description: true,
                     isAvailable: true,
-                    company: {
+                    /* company: {
                         select: {
                             id: true,
                             phoneNumber: true,
@@ -34,18 +34,17 @@ module.exports = {
                             country: true,
                             city: true,
                         }
-                    },
+                    }, */
                     likes: {
                         select: {
                             id: true,
                             userId: true,
                             createdAt: true,
-                            user: {
+                            /* user: {
                                 select: {
                                     id: true,
-                                    // other user fields ...
                                 }
-                            }
+                            } */
                         }
                     }
                 }

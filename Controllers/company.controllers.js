@@ -83,7 +83,7 @@ module.exports = {
                     // location: true,
                     // mapAddress: true,
                     // subscriptionId: true,
-                    annonces: {
+                    /* annonces: {
                         select: {
                             id: true,
                             nom: true,
@@ -97,7 +97,7 @@ module.exports = {
                             expiresIn: true,
                             companyId: true,
                         },
-                    },
+                    }, */
                 },
                 orderBy: {
                     id: 'desc',
