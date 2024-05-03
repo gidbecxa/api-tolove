@@ -250,6 +250,7 @@ model Reservation {
   startDate       DateTime
   endDate         DateTime
   totalPrice      Int?
+  quantity        Int              @default(1)
   createdAt       DateTime @default(now())
 
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
