@@ -8,9 +8,13 @@ const fs = require('fs');
 module.exports = {
     getAll: async (req, res) => {
         const { category } = req.params;
+        const { page = 1, pageSize = 10 } = req.query;
+        const skip = (page - 1) * pageSize;
 
         try {
             const annonces = await prisma.annonce.findMany({
+                skip: parseInt(skip),
+                take: parseInt(pageSize),
                 where: {
                     company: {
                         category: category // Filter annonces based on company category
@@ -300,6 +304,42 @@ module.exports = {
         } catch (error) {
             console.error('Error creating purchase:', error);
             res.status(500).json({ error: 'Failed to create purchase' });
+        }
+    },
+
+    getUserReservations: async (req, res) => {
+        const { userId } = req.params;
+
+        try {
+            const reservations = await prisma.reservation.findMany({
+                where: {
+                    userId: parseInt(userId),
+                },
+                include: {
+                    annonce: {
+                        select: {
+                            nom: true,
+                            image: true,
+                            prix: true,
+                            points: true,
+                            description: true,
+                            category: true,
+                            company: {
+                                select: {
+                                    id: true,
+                                    username: true,
+                                }
+                            }
+                        },
+                    },
+                },
+            });
+
+            console.log(`Found ${reservations.length} reservations for user ID ${userId}`);
+            res.status(200).json(reservations);
+        } catch (error) {
+            console.error('Error fetching purchases:', error);
+            res.status(500).json({ error: 'Failed to fetch reservations' });
         }
     },
 
