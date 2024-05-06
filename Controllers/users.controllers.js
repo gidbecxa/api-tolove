@@ -482,7 +482,9 @@ module.exports = {
             });
 
             const sortedChatrooms = chatrooms.map(chatroom => {
-                const unreadMessagesCount = chatroom.messages.filter(message => message.status !== 'read').length;
+                const unreadMessagesCount = chatroom.messages.filter(message =>
+                    message.status !== 'read' && message.sender !== parseInt(id)
+                ).length;
                 return {
                     ...chatroom,
                     unreadMessagesCount,
