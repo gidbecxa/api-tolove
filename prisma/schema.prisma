@@ -254,7 +254,6 @@ enum AnnonceCategory {
   jardinage
   jeux_loisirs
   sextoys
-  unclassified
 }
 
 model Reservation {
