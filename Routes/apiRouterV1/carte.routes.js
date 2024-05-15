@@ -10,6 +10,7 @@ const { upload } = require('../../multerConfig');
 module.exports = (apiRouter) => {
     // get routes
     apiRouter.route('/carte/company/get-all-annonces').get(companyMiddleware, carteCtrl.getAllAnnoncesByCompany);
+    apiRouter.route('/carte/company/get-reservations').get(companyMiddleware, carteCtrl.getCompanyReservations);
     apiRouter.route('/carte/getAll/:category').get(authMiddleware, carteCtrl.getAll);
 
     // apiRouter.route('/carte/getOne/:id').get(authMiddleware, carteCtrl.getOne);
