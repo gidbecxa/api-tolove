@@ -412,7 +412,7 @@ module.exports = {
         const { solde } = req.body;
         console.log('Body:', req.body);
 
-        prisma.user.update({
+        prisma.company.update({
             where: {
                 id: parseInt(id),
             },
