@@ -349,6 +349,43 @@ module.exports = {
             }
         }
     },
+    
+    verifyCompanyNoTwilio: async function (req, res) {
+        // const { verificationCode: code } = req.body;
+        const { code, phoneNumber, pays, username } = req.body;
+        console.log(code, pays, phoneNumber);
+
+        if (code === '001089') {
+            console.log('Attempting to create user...');
+            try {
+                const company = await prisma.company.create({
+                    data: {
+                        phoneNumber: phoneNumber,
+                        country: pays,
+                    },
+                });
+
+                const companyId = company.id;
+                const accessToken = jwtUtils.generateTokenForUser(company);
+                const refreshToken = jwtUtils.generateRefreshTokenForUser(company);
+
+                res.status(201).send({
+                    success: true,
+                    msg: 'User was created successfully',
+                    data: {
+                        'companyId': companyId,
+                        'access_token': accessToken,
+                        'refresh_token': refreshToken,
+                    },
+                });
+            } catch (error) {
+                res.status(500).send({
+                    success: false,
+                    msg: error.message || 'Some error occurred while creating the user',
+                });
+            }
+        }
+    },
 
     login: async function (req, res) {
 
