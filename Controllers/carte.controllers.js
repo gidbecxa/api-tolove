@@ -4,6 +4,7 @@ const { PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
 const { myS3Client } = require('../Utils/s3Client');
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const fs = require('fs');
+const { v4: uuidv4 } = require('uuid');
 
 module.exports = {
     getAll: async (req, res) => {
@@ -244,6 +245,62 @@ module.exports = {
         }
     },
 
+    getCompanyReservations: async (req, res) => {
+        console.log("Getting reservations for this company...");
+        try {
+            const { id } = req.company;
+            const limit = parseInt(req.query.limit) || 10;
+            const page = parseInt(req.query.page) || 1;
+
+            const offset = (page - 1) * limit;
+
+            const reservations = await prisma.reservation.findMany({
+                where: {
+                    annonce: {
+                        company: {
+                            id: id
+                        }
+                    }
+                },
+                include: {
+                    user: true,
+                    annonce: true
+                },
+                orderBy: {
+                    createdAt: 'desc',
+                },
+                skip: offset,
+                take: limit,
+            });
+
+            // Total number of reservations associated with the company
+            const totalReservations = await prisma.reservation.count({
+                where: {
+                    annonce: {
+                        company: {
+                            id: id
+                        }
+                    }
+                },
+            });
+
+            // Total number of pages
+            const totalPages = Math.ceil(totalReservations / limit);
+
+            return res.status(200).json({
+                success: true,
+                reservations: reservations,
+                currentPage: page,
+                totalPages: totalPages,
+                totalReservations: totalReservations,
+            });
+        } catch (error) {
+            console.error('Error retrieving reservations for this company:', error);
+            return res.status(500).json({ error: 'Failed to retrieve reservations for the company' });
+        }
+    },
+
+
     getPresignedUrl: async (req, res) => {
         const { photoURL } = req.body;
         console.log('URL for presignedURL: ', photoURL);
@@ -289,6 +346,8 @@ module.exports = {
             const endDate = new Date(startDate);
             endDate.setDate(endDate.getDate() + 30);
 
+            const reference = uuidv4();
+
             const newReservation = await prisma.reservation.create({
                 data: {
                     annonce: { connect: { id: parseInt(annonceId) } },
@@ -296,14 +355,15 @@ module.exports = {
                     startDate: new Date(),
                     endDate: endDate,
                     user: { connect: { id: parseInt(userId) } },
+                    reference: reference,
                 },
             });
 
-            console.log("Purchase successfully created", newReservation);
+            console.log("Reservation successfully created", newReservation);
             res.status(200).json({ success: true, newReservation });
         } catch (error) {
-            console.error('Error creating purchase:', error);
-            res.status(500).json({ error: 'Failed to create purchase' });
+            console.error('Error creating reservation:', error);
+            res.status(500).json({ error: 'Failed to create reservation' });
         }
     },
 
