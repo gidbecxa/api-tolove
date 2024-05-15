@@ -23,7 +23,6 @@ module.exports = (apiRouter) => {
     apiRouter.route('/company/getLogo/:id').get(companyCtrl.getLogo);
 
     // put routes
-    // apiRouter.route('/company/update/profileLogo/:id').put(authMiddleware, upload.single('image'), companyCtrl.updatePicture);
     apiRouter.route('/company/update/logo-description/').put(companyMiddleware, upload.single('image'), companyCtrl.updateProfilLastData);
     apiRouter.route('/company/update/profile').put(ValidatorMiddlewares(updateCompanySchema), companyMiddleware, companyCtrl.updateProfile);
 
