@@ -9,7 +9,7 @@ const { upload } = require('../../multerConfig');
 
 module.exports = (apiRouter) => {
 
-    apiRouter.route('/auth/register/').post(ValidatorMiddlewares(registerSchema), authCtrl.registerWithTwilio);
+    apiRouter.route('/auth/register/').post(ValidatorMiddlewares(registerSchema), authCtrl.register);
     apiRouter.route('/auth/add-user/:agentId').post(upload.single('image'), authCtrl.createUserByAgent);
     apiRouter.route('/auth/add-agent/:agentId').post(authCtrl.createAgent);
     apiRouter.route('/auth/verify/').post(ValidatorMiddlewares(verifySchema), authCtrl.verifyViaTwilio);
