@@ -27,7 +27,7 @@ module.exports = (apiRouter) => {
     apiRouter.route('/company/update/profile').put(ValidatorMiddlewares(updateCompanySchema), companyMiddleware, companyCtrl.updateProfile);
 
     apiRouter.route('/company/update/first-step/').put(ValidatorMiddlewares(updateCompanySchema), companyMiddleware, companyCtrl.updateFirstProfileData);
-    apiRouter.route('/company/update/coins/:id').put(authMiddleware, companyCtrl.updateSolde);
+    apiRouter.route('/company/update/coins/:id').put(companyMiddleware, companyCtrl.updateSolde);
 
     // post routes
     apiRouter.route('/company/subscribe/').post(ValidatorMiddlewares(companySubscriptionSchema), companyMiddleware, companyCtrl.subscribeCompany);
