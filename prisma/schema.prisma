@@ -264,11 +264,17 @@ model Reservation {
   startDate       DateTime
   endDate         DateTime
   totalPrice      Decimal?
-  quantity        Int              @default(1)
-  createdAt       DateTime @default(now())
+  quantity        Int                  @default(1)
+  createdAt       DateTime             @default(now())
+  status          ReservationStatus    @default(pending)
 
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   annonce         Annonce   @relation(fields: [annonceId], references: [id], onDelete: Cascade)
+}
+
+enum ReservationStatus {
+  pending
+  processed
 }
 
 model LikedAnnonce {

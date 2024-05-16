@@ -1337,7 +1337,7 @@ module.exports = {
         }
     },
 
-    createPurchase: async (req, res) => {
+    makePurchase: async (req, res) => {
         try {
             console.log("Creating new purchase...");
             console.log("New purchase details:", req.body);
