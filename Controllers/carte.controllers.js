@@ -346,7 +346,7 @@ module.exports = {
             const endDate = new Date(startDate);
             endDate.setDate(endDate.getDate() + 30);
 
-            const reference = uuidv4();
+            const reference = uuidv4().slice(0, 8);
 
             const newReservation = await prisma.reservation.create({
                 data: {
