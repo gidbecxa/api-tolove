@@ -521,6 +521,55 @@ module.exports = {
         })
     },
 
+    getProfilePhoto: async (req, res) => {
+        const { id } = req.params;
+
+        try {
+            const user = await prisma.company.findUnique({
+                where: {
+                    id: parseInt(id),
+                },
+                select: {
+                    logo: true,
+                },
+            });
+
+            if (!user || !user.logo) {
+                return res.status(404).json({ success: false, error: "User or profile photo not found" });
+            }
+
+            const photoProfilUrl = user.photoProfil;
+
+            const objectParams = {
+                Bucket: 'user.dmvision-bucket',
+                Key: photoProfilUrl.replace(`https://s3.eu-west-2.amazonaws.com/user.dmvision-bucket/`, ''),
+            }
+            // console.log(objectParams);
+
+            const createPresignedUrlWithClient = () => {
+                const client = myS3Client;
+                const command = new GetObjectCommand(objectParams);
+                return getSignedUrl(client, command, { expiresIn: 21600 });
+            }
+
+            try {
+                const photoPresignedURL = await createPresignedUrlWithClient({
+                    // region: objectParams.Region,
+                    bucket: objectParams.Bucket,
+                    key: objectParams.Key
+                });
+                // console.log("Presigned URL with client");
+
+                res.status(200).json({ success: true, url: photoPresignedURL });
+            } catch (error) {
+                console.error(error);
+            }
+        } catch (error) {
+            console.error("Error fetching profile photo: ", error);
+            res.status(500).json({ success: false, error: "Failed to fetch profile photo" });
+        }
+    },
+
     subscribeCompany: async (req, res) => {
         const { companyId, subscriptionId, } = req.body;
         console.log("Attempting to subcribe to a carte:", { companyId, subscriptionId, });

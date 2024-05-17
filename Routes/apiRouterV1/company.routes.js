@@ -1,5 +1,6 @@
 // Imports
 const companyCtrl = require('../../Controllers/company.controllers')
+const usersCtrl = require('../../Controllers/users.controllers')
 const { authMiddleware, companyMiddleware } = require('../../Middlewares/jwtauth.middlewares');
 const { ValidatorMiddlewares } = require('../../Middlewares/validator.middlewares');
 const refreshTokenCtrl = require('../../Controllers/refreshToken.controller')
@@ -19,7 +20,7 @@ module.exports = (apiRouter) => {
     apiRouter.route('/company/getAll/').get(companyCtrl.getAll);
     apiRouter.route('/company/me').get(companyMiddleware, companyCtrl.getMe);
     apiRouter.route('/company/getOne/:id').get(companyCtrl.getOne);
-    apiRouter.route('/company/get-profile-photo/:id').get(companyMiddleware, usersCtrl.getProfilePhoto);
+    apiRouter.route('/company/get-profile-photo/:id').get(companyMiddleware, companyCtrl.getProfilePhoto);
 
     apiRouter.route('/company/getLogo/:id').get(companyCtrl.getLogo);
 
