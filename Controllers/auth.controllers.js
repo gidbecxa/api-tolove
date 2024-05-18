@@ -556,11 +556,11 @@ module.exports = {
     },
 
     loginDemo: async function (req, res) {
-        const { phoneNumber, otp } = req.body;
+        const { phoneNumber, code } = req.body;
         console.log(phoneNumber, otp);
 
         // Check if the OTP is correct
-        if (otp !== '001089') {
+        if (code !== '001089') {
             return res.status(403).json({ success: false, msg: 'Invalid OTP' });
         }
 
