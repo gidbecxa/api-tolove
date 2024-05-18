@@ -38,7 +38,7 @@ module.exports = {
                 verificationRequest = await twilio.verify.v2.services(VERIFICATION_SID)
                     .verifications
                     .create({ to: phoneNumber, channel: 'sms' })
-                    // .then(verification => console.log('Verification data:', verification));
+                // .then(verification => console.log('Verification data:', verification));
 
                 res.status(201).send({
                     success: true,
@@ -211,7 +211,7 @@ module.exports = {
             verificationResult = await twilio.verify.v2.services(VERIFICATION_SID)
                 .verificationChecks
                 .create({ to: phoneNumber, code: code })
-                // .then(verification_check => console.log('Verification result data', verification_check));
+            // .then(verification_check => console.log('Verification result data', verification_check));
 
             if (verificationResult && verificationResult.status === 'approved') {
                 console.log('Verification approved. Attempting to create user...');
@@ -349,7 +349,7 @@ module.exports = {
             }
         }
     },
-    
+
     verifyCompanyNoTwilio: async function (req, res) {
         // const { verificationCode: code } = req.body;
         const { code, phoneNumber, pays, username } = req.body;
@@ -522,6 +522,60 @@ module.exports = {
                 res.status(500).json({ success: false, msg: 'unable to verify user' });
             });
 
+    },
+
+    loginDemo: async function (req, res) {
+        const { phoneNumber, otp } = req.body;
+        console.log(phoneNumber, otp);
+
+        // Check if the OTP is correct
+        if (otp !== '001089') {
+            return res.status(403).json({ success: false, msg: 'Invalid OTP' });
+        }
+
+        try {
+            const userFound = await prisma.user.findMany({
+                skip: 0,
+                take: 1,
+                where: {
+                    phoneNumber: {
+                        equals: phoneNumber,
+                    },
+                },
+                select: {
+                    id: true,
+                    phoneNumber: true,
+                    role: true
+                }
+            });
+
+            if (userFound.length > 0) {
+                console.log(userFound[0]);
+
+                if (userFound[0].phoneNumber === phoneNumber) {
+                    // Generate tokens
+                    const accessToken = jwtUtils.generateTokenForUser(userFound[0]);
+                    const refreshToken = jwtUtils.generateRefreshTokenForUser(userFound[0]);
+
+                    res.status(201).json({
+                        success: true,
+                        data: {
+                            userId: userFound[0].id,
+                            access_token: accessToken,
+                            refresh_token: refreshToken
+                        }
+                    });
+                } else {
+                    res.status(403).json({ success: false, msg: 'Phone number invalid or unauthorized role' });
+                }
+            } else {
+                res.status(404).json({ success: false, msg: 'User not found' });
+            }
+        } catch (err) {
+            console.log(err);
+            res.status(500).json({ success: false, msg: 'Unable to verify user' });
+        }
     }
+
 
 }

@@ -14,7 +14,8 @@ exports.verifySchema = yup.object().shape({
 });
 
 exports.loginSchema = yup.object({
-    usernameOrEmail: yup.string().required().trim(),
+    phoneNumber: yup.string().required().trim(),
+    code: yup.string().required().length(6)
 });
 
 exports.loginAdminSchema = yup.object({

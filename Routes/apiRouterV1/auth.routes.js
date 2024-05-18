@@ -14,7 +14,7 @@ module.exports = (apiRouter) => {
     apiRouter.route('/auth/add-agent/:agentId').post(authCtrl.createAgent);
     apiRouter.route('/auth/verify/').post(ValidatorMiddlewares(verifySchema), authCtrl.verify); // à changer plus tard à verifyViaTwilio
     apiRouter.route('/auth/verify/company/').post(ValidatorMiddlewares(verifySchema), authCtrl.verifyCompanyNoTwilio); // à changer plus tard à verifyCompany
-    apiRouter.route('/auth/login/').post(ValidatorMiddlewares(loginSchema), authCtrl.login);
+    apiRouter.route('/auth/login/').post(ValidatorMiddlewares(loginSchema), authCtrl.loginDemo);
     apiRouter.route('/auth/login-admin/').post(ValidatorMiddlewares(loginAdminSchema), authCtrl.loginAdmin);
     apiRouter.route('/auth/refresh_endpoint').post(refreshTokenCtrl.refreshToken);
 };
