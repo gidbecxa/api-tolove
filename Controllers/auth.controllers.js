@@ -557,7 +557,7 @@ module.exports = {
 
     loginDemo: async function (req, res) {
         const { phoneNumber, code } = req.body;
-        console.log(phoneNumber, otp);
+        console.log(phoneNumber, code);
 
         // Check if the OTP is correct
         if (code !== '001089') {
