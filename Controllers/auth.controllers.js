@@ -85,6 +85,37 @@ module.exports = {
 
     },
 
+    sendSigninCode: async function (req, res) {
+        const { pays, phoneNumber } = req.body;
+        // let verificationRequest;
+
+        try {
+            const response = await prisma.user.findMany({
+                skip: 0,
+                take: 1,
+                where: {
+                    phoneNumber: {
+                        equals: phoneNumber,
+                    },
+                },
+            })
+
+            if (response.length > 0) {
+                res.status(201).send({
+                    success: true,
+                    code: '001089',
+                    msg: 'Verification code sent successfully',
+                })
+            } else {
+                return res.status(422).send({ success: false, msg: 'This phone number does not exist' });
+            }
+        } catch (error) {
+            logger.error(error);
+            return res.status(500).send(error);
+        }
+
+    },
+
     createUserByAgent: async function (req, res) {
         console.log("Request body:", req.body);
         const { username, pays, phoneNumber, birthday, description, preference, genre, hobbies, ville } = req.body;
