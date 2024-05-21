@@ -301,6 +301,20 @@ module.exports = {
         console.log('Request body ', req.body);
 
         try {
+            const response = await prisma.user.findMany({
+                skip: 0,
+                take: 1,
+                where: {
+                    username: {
+                        equals: username,
+                    },
+                },
+            })
+
+            if (response.length > 0) {
+                return res.status(422).send({ success: false, msg: 'Ce nom d\'utilisateur est pris déjà' });
+            }
+
             const user = await prisma.user.update({
                 where: { id: parseInt(id) },
                 data: {
