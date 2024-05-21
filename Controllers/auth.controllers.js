@@ -70,7 +70,7 @@ module.exports = {
             })
 
             if (response.length > 0) {
-                return res.status(422).send({ success: false, msg: 'This phone number is already in use' });
+                return res.status(422).send({ success: false, msg: 'Ce numéro est déjà utlisé' });
             } else {
                 res.status(201).send({
                     success: true,
