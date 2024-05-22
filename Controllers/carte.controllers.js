@@ -157,12 +157,33 @@ module.exports = {
         const skip = (page - 1) * pageSize;
 
         try {
+            const currentUser = await prisma.user.findUnique({
+                where: {
+                    id: req.user.id,
+                },
+                select: {
+                    pays: true,
+                },
+            });
+
+            const country = currentUser.pays || null;
+
+            const whereClause = {
+                category: category,
+                ...(country && {
+                    company: {
+                        country: {
+                            contains: country,
+                            mode: 'insensitive'
+                        }
+                    }
+                }),
+            };
+
             const gifts = await prisma.annonce.findMany({
                 skip: parseInt(skip),
                 take: parseInt(pageSize),
-                where: {
-                    category: category,
-                },
+                where: whereClause,
                 select: {
                     id: true,
                     nom: true,
