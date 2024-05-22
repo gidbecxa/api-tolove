@@ -17,10 +17,8 @@ module.exports = {
                 skip: parseInt(skip),
                 take: parseInt(pageSize),
                 where: {
-                    AND: [
-                        { company: { id: companyId } },
-                        { company: { category: category } }
-                    ]
+                    companyId: parseInt(companyId),
+                    // company: { category: category }
                 },
                 select: {
                     id: true,
