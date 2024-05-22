@@ -8,7 +8,7 @@ const { v4: uuidv4 } = require('uuid');
 
 module.exports = {
     getAll: async (req, res) => {
-        const { category } = req.params;
+        const { category, companyId } = req.params;
         const { page = 1, pageSize = 10 } = req.query;
         const skip = (page - 1) * pageSize;
 
@@ -17,9 +17,10 @@ module.exports = {
                 skip: parseInt(skip),
                 take: parseInt(pageSize),
                 where: {
-                    company: {
-                        category: category // Filter annonces based on company category
-                    }
+                    AND: [
+                        { company: { id: companyId } },
+                        { company: { category: category } }
+                    ]
                 },
                 select: {
                     id: true,
@@ -62,7 +63,6 @@ module.exports = {
             res.status(500).json({ error: 'An error occurred while fetching annonces' });
         }
     },
-
 
     getOne: async (req, res) => {
         try {
