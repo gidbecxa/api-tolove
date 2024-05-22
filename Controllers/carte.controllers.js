@@ -69,8 +69,25 @@ module.exports = {
         const { city } = req.query;
 
         try {
+            const currentUser = await prisma.user.findUnique({
+                where: {
+                    id: req.user.id,
+                },
+                select: {
+                    pays: true,
+                },
+            });
+
+            const country = currentUser.pays || null;
+
             const whereClause = {
                 company: { category: "cadeau" },
+                ...(country && {
+                    country: {
+                        contains: country,
+                        mode: 'insensitive'
+                    }
+                }),
                 ...(city && {
                     company: {
                         city: {
