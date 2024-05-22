@@ -253,7 +253,7 @@ enum AnnonceCategory {
   litterature_ecriture
   jardinage
   jeux_loisirs
-  sextoys
+  coquins
 }
 
 model Reservation {
