@@ -83,9 +83,11 @@ module.exports = {
             const whereClause = {
                 company: { category: "cadeau" },
                 ...(country && {
-                    country: {
-                        contains: country,
-                        mode: 'insensitive'
+                    company: {
+                        country: {
+                            contains: country,
+                            mode: 'insensitive'
+                        }
                     }
                 }),
                 ...(city && {
