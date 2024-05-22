@@ -67,13 +67,13 @@ module.exports = {
                 },
             });
 
-            const pays = currentUser.pays || null;
+            const country = currentUser.pays || null;
 
             const whereClause = {
                 category: category,
-                ...(pays && {
-                    pays: {
-                        contains: pays,
+                ...(country && {
+                    country: {
+                        contains: country,
                         mode: 'insensitive'
                     }
                 })
