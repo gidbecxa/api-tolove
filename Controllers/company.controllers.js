@@ -138,7 +138,7 @@ module.exports = {
         const limit = parseInt(req.query.limit) || 8;
         const page = parseInt(req.query.page) || 0;
         const { category } = req.params;
-        const { city } = req.body;
+        const { city } = req.query;
 
         try {
             const totalRows = await prisma.company.count({
