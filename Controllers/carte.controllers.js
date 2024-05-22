@@ -66,15 +66,29 @@ module.exports = {
         // const { category, companyId } = req.params;
         const { page = 1, pageSize = 10 } = req.query;
         const skip = (page - 1) * pageSize;
+        const { city } = req.query;
 
         try {
+            const whereClause = {
+                company: { category: "cadeau" },
+                ...(city && {
+                    company: {
+                        city: {
+                            contains: city,
+                            mode: 'insensitive'
+                        }
+                    }
+                })
+            };
+
             const gifts = await prisma.annonce.findMany({
                 skip: parseInt(skip),
                 take: parseInt(pageSize),
-                where: {
-                    // companyId: parseInt(companyId),
-                    company: { category: "cadeau" }
-                },
+                // where: {
+                //     // companyId: parseInt(companyId),
+                //     company: { category: "cadeau" }
+                // },
+                where: whereClause,
                 select: {
                     id: true,
                     nom: true,
