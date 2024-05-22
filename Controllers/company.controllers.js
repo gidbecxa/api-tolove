@@ -58,15 +58,28 @@ module.exports = {
         const { category } = req.params;
 
         try {
+            // const currentUser = await prisma.user.findUnique({
+            //     where: {
+            //         id: req.user.id,
+            //     },
+            //     select: {
+            //         villes: true,
+            //     },
+            // });
+
+            // const city = currentUser.villes || null;
+
             const totalRows = await prisma.company.count({
                 where: {
                     category: category,
+                    // ...(city && { city: city })
                 }
             });
 
             const companies = await prisma.company.findMany({
                 where: {
-                    category: category
+                    category: category,
+                    // ...(city && { city: city })
                 },
                 skip: limit * page,
                 take: limit,
@@ -98,6 +111,60 @@ module.exports = {
                             companyId: true,
                         },
                     }, */
+                },
+                orderBy: {
+                    id: 'desc',
+                },
+            });
+
+            const totalPage = Math.ceil(totalRows / limit);
+
+            res.status(200).json({
+                result: companies,
+                page: page,
+                limit: limit,
+                totalRows: totalRows,
+                totalPage: totalPage,
+            });
+        } catch (error) {
+            res.status(500).send({
+                message: error.message || 'Some error occurred while retrieving companies',
+            });
+        }
+    },
+
+    getByCity: async (req, res) => {
+        console.log(`Query: limit: ${req.query.limit}, page: ${req.query.page}`);
+        const limit = parseInt(req.query.limit) || 8;
+        const page = parseInt(req.query.page) || 0;
+        const { category } = req.params;
+        const { city } = req.body;
+
+        try {
+            const totalRows = await prisma.company.count({
+                where: {
+                    category: category,
+                    ...(city && { city: city })
+                }
+            });
+
+            const companies = await prisma.company.findMany({
+                where: {
+                    category: category,
+                    ...(city && { city: city })
+                },
+                skip: limit * page,
+                take: limit,
+                select: {
+                    id: true,
+                    phoneNumber: true,
+                    username: true,
+                    email: true,
+                    category: true,
+                    logo: true,
+                    description: true,
+                    country: true,
+                    city: true,
                 },
                 orderBy: {
                     id: 'desc',
