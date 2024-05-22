@@ -58,29 +58,33 @@ module.exports = {
         const { category } = req.params;
 
         try {
-            // const currentUser = await prisma.user.findUnique({
-            //     where: {
-            //         id: req.user.id,
-            //     },
-            //     select: {
-            //         villes: true,
-            //     },
-            // });
+            const currentUser = await prisma.user.findUnique({
+                where: {
+                    id: req.user.id,
+                },
+                select: {
+                    pays: true,
+                },
+            });
 
-            // const city = currentUser.villes || null;
+            const pays = currentUser.pays || null;
+
+            const whereClause = {
+                category: category,
+                ...(pays && {
+                    pays: {
+                        contains: pays,
+                        mode: 'insensitive'
+                    }
+                })
+            };
 
             const totalRows = await prisma.company.count({
-                where: {
-                    category: category,
-                    // ...(city && { city: city })
-                }
+                where: whereClause
             });
 
             const companies = await prisma.company.findMany({
-                where: {
-                    category: category,
-                    // ...(city && { city: city })
-                },
+                where: whereClause,
                 skip: limit * page,
                 take: limit,
                 select: {
@@ -141,18 +145,22 @@ module.exports = {
         const { city } = req.query;
 
         try {
+            const whereClause = {
+                category: category,
+                ...(city && {
+                    city: {
+                        contains: city,
+                        mode: 'insensitive'
+                    }
+                })
+            };
+
             const totalRows = await prisma.company.count({
-                where: {
-                    category: category,
-                    ...(city && { city: city })
-                }
+                where: whereClause
             });
 
             const companies = await prisma.company.findMany({
-                where: {
-                    category: category,
-                    ...(city && { city: city })
-                },
+                where: whereClause,
                 skip: limit * page,
                 take: limit,
                 select: {
