@@ -35,8 +35,8 @@ module.exports = (apiRouter) => {
     
     apiRouter.route('/chatrooms/last-message/:chatroomId').get(authMiddleware, usersCtrl.getLastMessage);
     apiRouter.route('/users/get-profile-photo/:id').get(authMiddleware, usersCtrl.getProfilePhoto);
-    apiRouter.route('/gifts/get-gifts').get(authMiddleware, usersCtrl.getGifts);
-    apiRouter.route('/gifts/get-gifts-by-category/:category').get(authMiddleware, usersCtrl.getGiftsByCategory);
+    apiRouter.route('/gifts/get-gifts').get(authMiddleware, carteCtrl.getAllGifts);
+    apiRouter.route('/gifts/get-gifts-by-category/:category').get(authMiddleware, carteCtrl.getAllGiftsByCategory);
     apiRouter.route('/purchases/sender/:senderId/receiver/:receiverId').get(authMiddleware, usersCtrl.getPurchasesByUsers);
     apiRouter.route('/purchases/receiver/:receiverId').get(authMiddleware, usersCtrl.getPurchasesForUser);
     apiRouter.route('/user/get-reservations/:userId').get(authMiddleware, carteCtrl.getUserReservations);

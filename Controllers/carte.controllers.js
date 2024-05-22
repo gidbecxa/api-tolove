@@ -62,6 +62,116 @@ module.exports = {
         }
     },
 
+    getAllGifts: async (req, res) => {
+        // const { category, companyId } = req.params;
+        const { page = 1, pageSize = 10 } = req.query;
+        const skip = (page - 1) * pageSize;
+
+        try {
+            const gifts = await prisma.annonce.findMany({
+                skip: parseInt(skip),
+                take: parseInt(pageSize),
+                where: {
+                    // companyId: parseInt(companyId),
+                    company: { category: "cadeau" }
+                },
+                select: {
+                    id: true,
+                    nom: true,
+                    prix: true,
+                    points: true,
+                    image: true,
+                    description: true,
+                    isAvailable: true,
+                    category: true,
+                    /* company: {
+                        select: {
+                            id: true,
+                            phoneNumber: true,
+                            username: true,
+                            email: true,
+                            logo: true,
+                            country: true,
+                            city: true,
+                        }
+                    }, */
+                    likes: {
+                        select: {
+                            id: true,
+                            userId: true,
+                            createdAt: true,
+                            /* user: {
+                                select: {
+                                    id: true,
+                                }
+                            } */
+                        }
+                    }
+                }
+            });
+
+            res.status(200).json({ gifts });
+        } catch (error) {
+            console.error('Error getting gifts:', error);
+            res.status(500).json({ error: 'Failed to get gifts' });
+        }
+    },
+
+    getAllGiftsByCategory: async (req, res) => {
+        const { category } = req.params;
+        console.log("Attempting to fetch gifts by category...", category);
+        const { page = 1, pageSize = 10 } = req.query;
+        const skip = (page - 1) * pageSize;
+
+        try {
+            const gifts = await prisma.annonce.findMany({
+                skip: parseInt(skip),
+                take: parseInt(pageSize),
+                where: {
+                    category: category,
+                },
+                select: {
+                    id: true,
+                    nom: true,
+                    prix: true,
+                    points: true,
+                    image: true,
+                    description: true,
+                    isAvailable: true,
+                    category: true,
+                    /* company: {
+                        select: {
+                            id: true,
+                            phoneNumber: true,
+                            username: true,
+                            email: true,
+                            logo: true,
+                            country: true,
+                            city: true,
+                        }
+                    }, */
+                    likes: {
+                        select: {
+                            id: true,
+                            userId: true,
+                            createdAt: true,
+                            /* user: {
+                                select: {
+                                    id: true,
+                                }
+                            } */
+                        }
+                    }
+                }
+            });
+
+            res.status(200).json({ gifts });
+        } catch (error) {
+            console.error('Error getting gifts:', error);
+            res.status(500).json({ error: 'Failed to get gifts' });
+        }
+    },
+
     getOne: async (req, res) => {
         try {
             const { id } = req.params;
