@@ -100,13 +100,13 @@ module.exports = {
                 })
             };
 
+            const totalRows = await prisma.annonce.count({
+                where: whereClause
+            });
+
             const gifts = await prisma.annonce.findMany({
                 skip: parseInt(skip),
                 take: parseInt(pageSize),
-                // where: {
-                //     // companyId: parseInt(companyId),
-                //     company: { category: "cadeau" }
-                // },
                 where: whereClause,
                 select: {
                     id: true,
@@ -143,7 +143,15 @@ module.exports = {
                 }
             });
 
-            res.status(200).json({ gifts });
+            const totalPage = Math.ceil(totalRows / pageSize);
+
+            res.status(200).json({
+                gifts,
+                page: page,
+                limit: pageSize,
+                totalRows: totalRows,
+                totalPage: totalPage,
+            });
         } catch (error) {
             console.error('Error getting gifts:', error);
             res.status(500).json({ error: 'Failed to get gifts' });
