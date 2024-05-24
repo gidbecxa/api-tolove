@@ -158,8 +158,6 @@ model Gift {
   expiresIn     Int              @default(30)
   companyId     Int?
   company       Company?         @relation(fields: [companyId], references: [id], onDelete: Cascade)
-
-  purchases     Purchase[]
 }
 
 enum GiftCategory {
