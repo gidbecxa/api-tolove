@@ -685,7 +685,7 @@ module.exports = {
         console.log('URL for presignedURL: ', photoURL);
 
         // Determine the bucket dynamically
-        const bucketPrefix = photoURL.includes('cadeau.dmvision-bucket') ? 'cadeau.dmvision-bucket' : 'user.dmvision-bucket';
+        const bucketPrefix = photoURL.includes('annonce.dmvision-bucket') ? 'annonce.dmvision-bucket' : 'user.dmvision-bucket';
 
         const objectParams = {
             Bucket: bucketPrefix,
