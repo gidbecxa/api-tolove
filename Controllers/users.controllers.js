@@ -1356,11 +1356,11 @@ module.exports = {
             console.log("Creating new purchase...");
             console.log("New purchase details:", req.body);
 
-            const { giftId, quantity, senderId, receiverId } = req.body;
+            const { annonceId, quantity, senderId, receiverId } = req.body;
 
             const newPurchase = await prisma.purchase.create({
                 data: {
-                    gift: { connect: { id: parseInt(giftId) } },
+                    annonce: { connect: { id: parseInt(annonceId) } },
                     qtyPurchased: parseInt(quantity),
                     datePurchased: new Date(),
                     sender: { connect: { id: parseInt(senderId) } },
