@@ -1387,11 +1387,11 @@ module.exports = {
                     status: 'pending'
                 },
                 include: {
-                    gift: {
+                    annonce: {
                         select: {
                             nom: true,
                             image: true,
-                            giftCategory: true,
+                            category: true,
                         },
                     },
                 },
@@ -1419,11 +1419,11 @@ module.exports = {
                     receiverId: parseInt(receiverId),
                 },
                 include: {
-                    gift: {
+                    annonce: {
                         select: {
                             nom: true,
                             image: true,
-                            giftCategory: true,
+                            category: true,
                         },
                     },
                 },
