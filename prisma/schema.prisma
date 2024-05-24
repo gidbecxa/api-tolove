@@ -180,8 +180,8 @@ enum GiftCategory {
 
 model Purchase {
   id                Int               @id @default(autoincrement())
-  gift              Gift              @relation(fields: [giftId], references: [id])
-  giftId            Int
+  annonce           Annonce           @relation(fields: [annonceId], references: [id])
+  annonceId         Int
   qtyPurchased      Int               @default(1)
   datePurchased     DateTime
   sender            User              @relation("purchaseSender", fields: [senderId], references: [id])
@@ -213,6 +213,7 @@ model Annonce {
   companyId         Int?
   company           Company?         @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
+  purchases     Purchase[]
   reservations      Reservation[]
   likes             LikedAnnonce[]
 }
