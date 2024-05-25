@@ -613,7 +613,7 @@ module.exports = {
                 return res.status(404).json({ success: false, error: "User or profile photo not found" });
             }
 
-            const photoProfilUrl = user.photoProfil;
+            const photoProfilUrl = user.logo;
 
             const objectParams = {
                 Bucket: 'user.dmvision-bucket',
