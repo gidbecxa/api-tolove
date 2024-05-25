@@ -56,7 +56,7 @@ module.exports = {
 
     register: async function (req, res) {
         const { pays, phoneNumber } = req.body;
-        // let verificationRequest;
+        console.log('Request recieved for sending OTP: phone number, ', phoneNumber);
 
         try {
             const response = await prisma.user.findMany({
