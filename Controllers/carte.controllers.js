@@ -117,7 +117,7 @@ module.exports = {
                     description: true,
                     isAvailable: true,
                     category: true,
-                    /* company: {
+                    company: {
                         select: {
                             id: true,
                             phoneNumber: true,
@@ -127,7 +127,7 @@ module.exports = {
                             country: true,
                             city: true,
                         }
-                    }, */
+                    },
                     likes: {
                         select: {
                             id: true,
