@@ -484,7 +484,7 @@ module.exports = {
     updateSolde: async function (req, res) {
 
         const { id } = req.params;
-        const { solde } = req.body;
+        const { coins } = req.body;
         console.log('Body:', req.body);
 
         prisma.company.update({
@@ -492,7 +492,7 @@ module.exports = {
                 id: parseInt(id),
             },
             data: {
-                solde: solde,
+                solde: coins,
             },
         })
             .then(() => {
