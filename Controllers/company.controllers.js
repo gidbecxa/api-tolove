@@ -645,6 +645,25 @@ module.exports = {
         }
     },
 
+    countTotalLikesForCompany: async (req, res) => {
+        try {
+            const { id } = req.company;
+
+            const totalLikes = await prisma.likedAnnonce.count({
+                where: {
+                    annonce: {
+                        companyId: parseInt(id),
+                    },
+                },
+            });
+
+            res.status(200).json({ success: true, totalLikes });
+        } catch (error) {
+            console.error('Error counting company annonces total likes:', error);
+            res.status(500).json({ error: 'An error occurred while counting total likes.' });
+        }
+    },
+
     subscribeCompany: async (req, res) => {
         const { companyId, subscriptionId, } = req.body;
         console.log("Attempting to subcribe to a carte:", { companyId, subscriptionId, });

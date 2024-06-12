@@ -21,8 +21,8 @@ module.exports = (apiRouter) => {
     apiRouter.route('/company/me').get(companyMiddleware, companyCtrl.getMe);
     apiRouter.route('/company/getOne/:id').get(companyCtrl.getOne);
     apiRouter.route('/company/get-profile-photo/:id').get(companyMiddleware, companyCtrl.getProfilePhoto);
-
     apiRouter.route('/company/getLogo/:id').get(companyCtrl.getLogo);
+    apiRouter.route('/company/annonces/total-likes').get(companyMiddleware, companyCtrl.countTotalLikesForCompany);
 
     // put routes
     apiRouter.route('/company/update/logo-description/').put(companyMiddleware, upload.single('image'), companyCtrl.updateProfilLastData);
