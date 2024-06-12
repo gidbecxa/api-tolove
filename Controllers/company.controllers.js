@@ -646,6 +646,7 @@ module.exports = {
     },
 
     countTotalLikesForCompany: async (req, res) => {
+        console.log("Count total likes for annonces...");
         try {
             const { id } = req.company;
 
