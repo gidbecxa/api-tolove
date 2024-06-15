@@ -377,6 +377,7 @@ model Company {
   subscriptions         CompanySubscription[] 
   annonces              Annonce[]
   gifts                 Gift[]
+  retraits              Retrait[]
 }
 
 model CompanySubscription {
