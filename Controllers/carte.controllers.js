@@ -363,7 +363,7 @@ module.exports = {
         console.log("Creating new annonce...");
         console.log("New gift details:", req.body);
 
-        const { nom, prix, category, description, points } = req.body;
+        const { nom, prix, category, description, days } = req.body;
         const { id } = req.company;
 
         // Handle image upload to S3
@@ -400,9 +400,10 @@ module.exports = {
                     category: category,
                     description: description,
                     prix: parseFloat(prix),
-                    points: parseFloat(points),
+                    // points: parseFloat(points),
                     image: imageUrl,
                     companyId: id,
+                    expiresIn:  parseInt(days)
                 },
             });
 
