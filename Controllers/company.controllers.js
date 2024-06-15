@@ -459,7 +459,7 @@ module.exports = {
     requestWithdrawal: async (req, res) => {
         try {
             const { amount } = req.body;
-            const companyId = req.user.id;
+            const companyId = req.company.id;
 
             const company = await prisma.company.findUnique({
                 where: { id: companyId },
