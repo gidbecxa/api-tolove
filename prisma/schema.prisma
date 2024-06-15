@@ -413,3 +413,24 @@ enum AccountDeleteStatus {
   pending
   deleted
 }
+
+model Retrait {
+  id         Int      @id @default(autoincrement())
+  companyId  Int
+  amount     Float
+  reference  String?   @unique
+  status     RetraitStatus @default(pending)
+  comment    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  company    Company  @relation(fields: [companyId], references: [id])
+
+  @@index([companyId])
+}
+
+enum RetraitStatus {
+  pending
+  approved
+  rejected
+}
