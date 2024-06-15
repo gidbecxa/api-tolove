@@ -487,6 +487,41 @@ module.exports = {
         }
     },
 
+    getPendingRetraits: async (req, res) => {
+        try {
+            const { page = 1, limit = 10 } = req.query;
+            const skip = (page - 1) * limit;
+
+            const totalCount = await prisma.retrait.count();
+            const pendingRetraits = await prisma.retrait.findMany({
+                where: {
+                    status: 'pending',
+                },
+                include: {
+                    company: {
+                        select: {
+                            id: true,
+                            username: true,
+                            solde: true
+                        },
+                    },
+                },
+                skip,
+                take: limit
+            });
+
+            res.status(200).json({
+                data: pendingRetraits,
+                totalCount,
+                currentPage: page,
+                totalPages: Math.ceil(totalCount / limit),
+            });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'An error occurred while fetching pending withdrawals' });
+        }
+    },
+
     updateFirstProfileData: async (req, res) => {
         const { id } = req.company;
         // console.log('id: ', id);
