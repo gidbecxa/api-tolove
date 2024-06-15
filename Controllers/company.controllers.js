@@ -467,7 +467,7 @@ module.exports = {
 
             if (company.solde < amount) {
                 // return res.status(400).json({ error: 'Insufficient balance' });
-                return res.status(400).send({ success: false, msg: 'Ce numéro est déjà utlisé' });
+                return res.status(400).send({ success: false, msg: 'Votre solde est insuffisant' });
             }
 
             // const reference = generateUniqueReference();
