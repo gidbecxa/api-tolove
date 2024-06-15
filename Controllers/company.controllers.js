@@ -507,7 +507,7 @@ module.exports = {
                     },
                 },
                 skip,
-                take: limit
+                take: parseInt(limit),
             });
 
             res.status(200).json({
