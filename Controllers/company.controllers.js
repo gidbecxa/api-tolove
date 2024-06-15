@@ -475,7 +475,7 @@ module.exports = {
             const withdrawal = await prisma.retrait.create({
                 data: {
                     companyId,
-                    amount,
+                    amount: parseFloat(amount),
                     // reference,
                 },
             });
