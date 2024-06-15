@@ -456,6 +456,36 @@ module.exports = {
 
     },
 
+    requestWithdrawal: async (req, res) => {
+        try {
+            const { amount } = req.body;
+            const companyId = req.user.id;
+
+            const company = await prisma.company.findUnique({
+                where: { id: companyId },
+            });
+
+            if (company.solde < amount) {
+                return res.status(400).json({ error: 'Insufficient balance' });
+            }
+
+            // const reference = generateUniqueReference();
+
+            const withdrawal = await prisma.retrait.create({
+                data: {
+                    companyId,
+                    amount,
+                    // reference,
+                },
+            });
+
+            res.status(201).json(withdrawal);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'An error occurred while requesting withdrawal' });
+        }
+    },
+
     updateFirstProfileData: async (req, res) => {
         const { id } = req.company;
         // console.log('id: ', id);

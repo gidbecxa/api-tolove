@@ -35,4 +35,6 @@ module.exports = (apiRouter) => {
     apiRouter.route('/company/subscribe/').post(ValidatorMiddlewares(companySubscriptionSchema), companyMiddleware, companyCtrl.subscribeCompany);
     apiRouter.route('/company/unSubscribe/').post(companyMiddleware, companyCtrl.unSubscribeCompany);
     apiRouter.route('/company/logo/presigned-url').post(companyCtrl.getLogoWithUrl);
+    // /companies/withdrawals
+    apiRouter.route('/companies/withdrawals/').post(companyMiddleware, companyCtrl.requestWithdrawal);
 };
