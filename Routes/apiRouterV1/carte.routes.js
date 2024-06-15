@@ -12,6 +12,7 @@ module.exports = (apiRouter) => {
     apiRouter.route('/carte/company/get-all-annonces').get(companyMiddleware, carteCtrl.getAllAnnoncesByCompany);
     apiRouter.route('/carte/company/get-reservations').get(companyMiddleware, carteCtrl.getCompanyReservations);
     apiRouter.route('/carte/getAll/:category/:companyId').get(authMiddleware, carteCtrl.getAll);
+    apiRouter.route('/carte/get-all-rows').get(authMiddleware, carteCtrl.getAllAnnonces);
 
     // apiRouter.route('/carte/getOne/:id').get(authMiddleware, carteCtrl.getOne);
     // apiRouter.route('/carte/checkCarteLike').get(authMiddleware, carteCtrl.checkCarteLike);

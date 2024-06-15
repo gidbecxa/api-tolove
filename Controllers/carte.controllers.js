@@ -18,7 +18,7 @@ module.exports = {
                 take: parseInt(pageSize),
                 where: {
                     companyId: parseInt(companyId),
-                    // company: { category: category }
+                    isVerified: true,
                 },
                 select: {
                     id: true,
@@ -61,6 +61,53 @@ module.exports = {
             res.status(500).json({ error: 'An error occurred while fetching annonces' });
         }
     },
+
+    getAllAnnonces: async (req, res) => {
+        const { page = 1, pageSize = 10 } = req.query;
+        const skip = (page - 1) * pageSize;
+    
+        try {
+            const totalRows = await prisma.annonce.count();
+            const annonces = await prisma.annonce.findMany({
+                skip: parseInt(skip),
+                take: parseInt(pageSize),
+                select: {
+                    id: true,
+                    nom: true,
+                    prix: true,
+                    points: true,
+                    image: true,
+                    description: true,
+                    isAvailable: true,
+                    category: true,
+                    company: {
+                        select: {
+                            id: true,
+                            phoneNumber: true,
+                            username: true,
+                            email: true,
+                            logo: true,
+                            country: true,
+                            city: true,
+                        }
+                    },
+                }
+            });
+    
+            const totalPages = Math.ceil(totalRows / pageSize);
+    
+            res.status(200).json({
+                annonces,
+                currentPage: page,
+                totalPages,
+                totalRows,
+                pageSize,
+            });
+        } catch (error) {
+            console.error('Error fetching annonces:', error);
+            res.status(500).json({ error: 'An error occurred while fetching annonces' });
+        }
+    }, 
 
     getAllGifts: async (req, res) => {
         // const { category, companyId } = req.params;

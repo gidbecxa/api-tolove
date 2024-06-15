@@ -207,7 +207,8 @@ model Annonce {
   category          AnnonceCategory @default(unclassified)
   isAvailable       Boolean         @default(true)
   createdAt         DateTime        @default(now())
-  expiresIn     Int              @default(30)
+  expiresIn         Int             @default(30)
+  isVerified        Boolean         @default(false)
   companyId         Int?
   company           Company?         @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
