@@ -71,6 +71,9 @@ module.exports = {
             const annonces = await prisma.annonce.findMany({
                 skip: parseInt(skip),
                 take: parseInt(pageSize),
+                where: {
+                    isVerified: false,
+                },
                 select: {
                     id: true,
                     nom: true,
