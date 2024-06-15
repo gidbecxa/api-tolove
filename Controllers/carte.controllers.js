@@ -80,6 +80,7 @@ module.exports = {
                     description: true,
                     isAvailable: true,
                     category: true,
+                    expiresIn: true,
                     company: {
                         select: {
                             id: true,
