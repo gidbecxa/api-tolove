@@ -65,7 +65,7 @@ module.exports = {
     getAllAnnonces: async (req, res) => {
         const { page = 1, pageSize = 10 } = req.query;
         const skip = (page - 1) * pageSize;
-    
+
         try {
             const totalRows = await prisma.annonce.count();
             const annonces = await prisma.annonce.findMany({
@@ -94,9 +94,9 @@ module.exports = {
                     },
                 }
             });
-    
+
             const totalPages = Math.ceil(totalRows / pageSize);
-    
+
             res.status(200).json({
                 annonces,
                 currentPage: page,
@@ -108,7 +108,7 @@ module.exports = {
             console.error('Error fetching annonces:', error);
             res.status(500).json({ error: 'An error occurred while fetching annonces' });
         }
-    }, 
+    },
 
     getAllGifts: async (req, res) => {
         // const { category, companyId } = req.params;
@@ -404,7 +404,7 @@ module.exports = {
                     // points: parseFloat(points),
                     image: imageUrl,
                     companyId: id,
-                    expiresIn:  parseInt(days)
+                    expiresIn: parseInt(days)
                 },
             });
 
@@ -621,6 +621,28 @@ module.exports = {
             res.status(500).json({ error: 'Failed to fetch reservations' });
         }
     },
+
+    updateAnnonceVerification: async (req, res) => {
+        try {
+            const { annonceId } = req.params;
+            const { value } = req.body;
+
+            const updatedAnnonce = await prisma.annonce.update({
+                where: {
+                    id: parseInt(annonceId),
+                },
+                data: {
+                    isVerified: value,
+                },
+            });
+
+            res.status(200).json(updatedAnnonce);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'An error occurred while updating the annonce verification status.' });
+        }
+    },
+
 
     deleteCarte: async (req, res) => {
 
