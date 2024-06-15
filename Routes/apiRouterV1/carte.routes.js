@@ -20,7 +20,6 @@ module.exports = (apiRouter) => {
 
     // post routes
     apiRouter.route('/annonce/create-annonce').post(companyMiddleware, upload.single('image'), carteCtrl.createAnnonce);
-    apiRouter.route('/annonce/update-annonce-verification/:annonceId').post(authMiddleware, carteCtrl.updateAnnonceVerification);
     apiRouter.route('/annonce/photos/presigned-url').post(carteCtrl.getPresignedUrl);
 
     // apiRouter.route('/carte/searchCarte').post(carteCtrl.searchCarte);
@@ -33,5 +32,5 @@ module.exports = (apiRouter) => {
     // apiRouter.route('/carte/addNewPhotoCarte').post(ValidatorMiddlewares(addNewPhotoCarteSchema), authMiddleware, carteCtrl.addNewPhotoCarte);
 
     // put routes
-    // apiRouter.route('/carte/updateCarte/:id').put(ValidatorMiddlewares(updateCarteSchema), authMiddleware, carteCtrl.updateCarte);
+    apiRouter.route('/annonce/update-annonce-verification/:annonceId').put(authMiddleware, carteCtrl.updateAnnonceVerification);
 };
