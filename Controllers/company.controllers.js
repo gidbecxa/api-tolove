@@ -466,7 +466,8 @@ module.exports = {
             });
 
             if (company.solde < amount) {
-                return res.status(400).json({ error: 'Insufficient balance' });
+                // return res.status(400).json({ error: 'Insufficient balance' });
+                return res.status(400).send({ success: false, msg: 'Ce numéro est déjà utlisé' });
             }
 
             // const reference = generateUniqueReference();
