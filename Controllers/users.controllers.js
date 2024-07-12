@@ -1474,6 +1474,93 @@ module.exports = {
             console.error('Error registering account deletion request:', error);
             res.status(500).json({ success: false, message: 'Failed to register account deletion request.' });
         }
+    },
+
+    searchDMAndDMP: async (req, res) => {
+        const limit = parseInt(req.query.limit) || 8;
+        const page = parseInt(req.query.page) || 0;
+        const { dmInfoSearch } = req.params;
+
+        try {
+            // Get All Companies using typed word
+            const whereClause = {
+                ...(dmInfoSearch && {
+                    username: { contains: dmInfoSearch, mode: 'insensitive' },
+                }),
+            };
+
+            // const totalRows = await prisma.company.count({ where: whereClause });
+
+            const companiesFound = await prisma.company.findMany({
+                where: whereClause,
+                skip: limit * page,
+                take: limit,
+                select: {
+                    id: true,
+                    phoneNumber: true,
+                    username: true,
+                    email: true,
+                    category: true,
+                    logo: true,
+                    description: true,
+                    country: true,
+                    city: true,
+                },
+                orderBy: { id: 'desc' },
+            });
+
+
+            // Get All Users using typed word
+            const usersFound = await prisma.user.findMany({
+                where: whereClauseForUsers,
+                skip: limit * page,
+                take: limit,
+                select: {
+                    id: true,
+                    username: true,
+                    phoneNumber: true,
+                    birthday: true,
+                    langage: true,
+                    genre: true,
+                    hobbies: true,
+                    description: true,
+                    photoProfil: true,
+                    pays: true,
+                    villes: true,
+                },
+                orderBy: {
+                    id: 'desc',
+                },
+            });
+
+            // Get total counts
+            const [totalCompanies, totalUsers] = await Promise.all([
+                prisma.company.count({ where: whereClause }),
+                prisma.user.count({ where: whereClauseForUsers })
+            ]);
+
+            const totalRows = totalCompanies + totalUsers;
+
+            const [companies, users] = await Promise.all([companiesFound, usersFound]);
+
+            const combinedData = [...companies, ...users];
+
+            const paginatedData = combinedData.slice(page * limit, (page + 1) * limit);
+            const totalPages = Math.ceil(totalRows / limit);
+
+
+            res.json({
+                totalRows,
+                totalPages,
+                results: paginatedData,
+                page,
+                limit
+            });
+
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'An error occurred while fetching data' });
+        }
     }
 
 }
