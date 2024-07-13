@@ -1482,7 +1482,7 @@ module.exports = {
         const { dmInfoSearch } = req.params;
 
         try {
-            // Get All Companies using typed word
+            // Get All Companies and Users using typed word
             const whereClause = {
                 ...(dmInfoSearch && {
                     username: { contains: dmInfoSearch, mode: 'insensitive' },
@@ -1510,7 +1510,6 @@ module.exports = {
             });
 
 
-            // Get All Users using typed word
             const usersFound = await prisma.user.findMany({
                 where: whereClauseForUsers,
                 skip: limit * page,

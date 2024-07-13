@@ -42,6 +42,8 @@ module.exports = (apiRouter) => {
     apiRouter.route('/purchases/receiver/:receiverId').get(authMiddleware, usersCtrl.getPurchasesForUser);
     apiRouter.route('/user/get-reservations/:userId').get(authMiddleware, carteCtrl.getUserReservations);
 
+    apiRouter.route('/users-companies/search').get(authMiddleware, usersCtrl.searchDMAndDMP);
+
     // put routes
     apiRouter.route('/users/update/complementpart1/:id').put(ValidatorMiddlewares(updateProfilePartOneSchema), authMiddleware, usersCtrl.updateProfilPartOne);
     apiRouter.route('/users/update/complementPart2/:id').put(authMiddleware, upload.single('image'), usersCtrl.updateProfilPartTwo);
