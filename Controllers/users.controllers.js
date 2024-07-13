@@ -1536,7 +1536,7 @@ module.exports = {
             // Get total counts
             const [totalCompanies, totalUsers] = await Promise.all([
                 prisma.company.count({ where: whereClause }),
-                prisma.user.count({ where: whereClauseForUsers })
+                prisma.user.count({ where: whereClause })
             ]);
 
             const totalRows = totalCompanies + totalUsers;
