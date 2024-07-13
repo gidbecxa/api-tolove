@@ -1512,7 +1512,7 @@ module.exports = {
 
 
             const usersFound = await prisma.user.findMany({
-                where: whereClauseForUsers,
+                where: whereClause,
                 skip: limit * page,
                 take: limit,
                 select: {
