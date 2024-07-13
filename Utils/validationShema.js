@@ -152,3 +152,8 @@ exports.updateCompanySchema = yup.object({
     city: yup.string().required(errorTypeOne),
     numeroSocial: yup.string().required(),
 });
+
+exports.addUserCompanySchema = yup.object({
+    userId: yup.string().required('User ID is required'),
+    companyId: yup.string().required('Company ID is required'),
+});

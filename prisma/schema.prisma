@@ -42,6 +42,7 @@ model User {
   role              Role                  @default(USER)
   assignedAgent     Int?
   deviceToken       String?
+  createdAt         DateTime              @default(now())
 
   to                Match[]               @relation("to")
   from              Match[]               @relation("from")
@@ -55,8 +56,7 @@ model User {
   reservations      Reservation[]
   sentPurchases     Purchase[]            @relation("purchaseSender")
   receivedPurchases Purchase[]            @relation("purchaseReceiver")
-
-  createdAt         DateTime              @default(now())
+  userCompanies     UserCompany[]
 }
 
 enum Genre {
@@ -378,6 +378,21 @@ model Company {
   annonces              Annonce[]
   gifts                 Gift[]
   retraits              Retrait[]
+  userCompanies         UserCompany[]
+}
+
+model UserCompany {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  companyId   Int
+  category    String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime? @updatedAt
+  user        User      @relation(fields: [userId], references: [id])
+  company     Company   @relation(fields: [companyId], references: [id])
+
+  @@index([userId])
+  @@index([companyId])
 }
 
 model CompanySubscription {

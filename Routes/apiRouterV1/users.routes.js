@@ -8,7 +8,8 @@ const { authMiddleware } = require('../../Middlewares/jwtauth.middlewares');
 const { ValidatorMiddlewares } = require('../../Middlewares/validator.middlewares');
 
 const {
-    updateUserSchema, updateHobbiesSchema, updateUserDescriptionSchema, updateProfilePartOneSchema, updateProfilePartTwoSchema, updateUserPhotoSchema
+    updateUserSchema, updateHobbiesSchema, updateUserDescriptionSchema, updateProfilePartOneSchema, updateProfilePartTwoSchema, updateUserPhotoSchema,
+    addUserCompanySchema
 } = require('../../Utils/validationShema');
 const { upload } = require('../../multerConfig');
 
@@ -43,6 +44,7 @@ module.exports = (apiRouter) => {
     apiRouter.route('/user/get-reservations/:userId').get(authMiddleware, carteCtrl.getUserReservations);
 
     apiRouter.route('/users-companies/search').get(authMiddleware, usersCtrl.searchDMAndDMP);
+    apiRouter.route('/user/user-dm-companies/getAll').get(authMiddleware, usersCtrl.getUserCompanies);
 
     // put routes
     apiRouter.route('/users/update/complementpart1/:id').put(ValidatorMiddlewares(updateProfilePartOneSchema), authMiddleware, usersCtrl.updateProfilPartOne);
@@ -70,4 +72,5 @@ module.exports = (apiRouter) => {
     apiRouter.route('/purchase/new-purchase').post(authMiddleware, usersCtrl.makePurchase);
     apiRouter.route('/annonce/new-reservation').post(authMiddleware, carteCtrl.makeReservation);
     apiRouter.route('/delete-account').post(authMiddleware, usersCtrl.requestAccountDelete);
+    apiRouter.route('/user/user-dm-companies/addNew').post(ValidatorMiddlewares(addUserCompanySchema), usersCtrl.addUserCompany);
 };

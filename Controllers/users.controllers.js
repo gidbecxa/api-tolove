@@ -1561,6 +1561,72 @@ module.exports = {
             console.error(error);
             res.status(500).json({ error: 'An error occurred while fetching data' });
         }
+    },
+
+    addUserCompany: async (req, res) => {
+        const { userId, companyId, category } = req.body;
+        console.log("Attempting to add userCompany:", { userId, companyId, category });
+
+        try {
+            const existingUserCompany = await prisma.userCompany.findFirst({
+                where: {
+                    userId,
+                    category
+                }
+            });
+
+            if (existingUserCompany) {
+                // Update the existing record with the new companyId
+                const updatedUserCompany = await prisma.userCompany.update({
+                    where: {
+                        id: existingUserCompany.id
+                    },
+                    data: {
+                        companyId,
+                        updatedAt: new Date()
+                    }
+                });
+                console.log("Updated existing userCompany:", updatedUserCompany);
+                res.status(200).json({ success: true, data: updatedUserCompany });
+            } else {
+                // Create a new record
+                const newUserCompany = await prisma.userCompany.create({
+                    data: {
+                        userId,
+                        companyId,
+                        category,
+                        createdAt: new Date()  // Set the creation timestamp
+                    }
+                });
+                console.log("Created new userCompany:", newUserCompany);
+                res.status(201).json({ success: true, data: newUserCompany });
+            }
+        } catch (error) {
+            console.error('Error while adding userCompany:', error);
+            res.status(500).json({ success: false, error: "Failed to add userCompany" });
+        }
+    },
+
+    getUserCompanies: async (req, res) => {
+        const userId = req.user.id;
+        console.log("Fetching companies for user:", userId);
+
+        try {
+            const userCompanies = await prisma.userCompany.findMany({
+                where: {
+                    userId: userId,
+                },
+                include: {
+                    company: true,
+                },
+            });
+
+            console.log("Fetched user companies:", userCompanies);
+            res.status(200).json({ success: true, data: userCompanies });
+        } catch (error) {
+            console.error('Error while fetching user companies:', error);
+            res.status(500).json({ success: false, error: "Failed to fetch user companies" });
+        }
     }
 
 }
