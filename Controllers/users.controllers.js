@@ -1480,6 +1480,7 @@ module.exports = {
         const limit = parseInt(req.query.limit) || 8;
         const page = parseInt(req.query.page) || 0;
         const { dmInfoSearch } = req.query;
+        console.log('Searching DM and DMP by: ', dmInfoSearch)
 
         try {
             // Get All Companies and Users using typed word
