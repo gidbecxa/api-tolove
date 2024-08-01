@@ -8,7 +8,7 @@ const {
 
 module.exports = (apiRouter) => {
     // get routes
-    apiRouter.route('/country/getAll/').get(countryCtrl.getAll);
+    apiRouter.route('/country/getAll').get(countryCtrl.getAll);
     apiRouter.route('/country/getOne/:id').get(countryCtrl.getOne);
 
     // post routes

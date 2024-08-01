@@ -157,3 +157,18 @@ exports.addUserCompanySchema = yup.object({
     userId: yup.string().required('User ID is required'),
     companyId: yup.string().required('Company ID is required'),
 });
+
+exports.fetchUsersbyDistanceSchema = yup.object({
+    userCoordinates: yup.object().shape({
+        longitude: yup.string().required('User distance longitude is required'),
+        latitude: yup.string().required('User distance latitude is required'),
+    }),
+    comparedCoordinates: yup.object().shape({
+        longitude: yup.string().required('Searched distance longitude is required'),
+        latitude: yup.string().required('Searched distance latitude is required'),
+    }),
+});
+
+exports.removeUserFromPodiumSchema = yup.object({
+    id: yup.string().required('User ID is required'),
+});

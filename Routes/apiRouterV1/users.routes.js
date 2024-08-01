@@ -9,7 +9,7 @@ const { ValidatorMiddlewares } = require('../../Middlewares/validator.middleware
 
 const {
     updateUserSchema, updateHobbiesSchema, updateUserDescriptionSchema, updateProfilePartOneSchema, updateProfilePartTwoSchema, updateUserPhotoSchema,
-    addUserCompanySchema
+    addUserCompanySchema, fetchUsersbyDistanceSchema
 } = require('../../Utils/validationShema');
 const { upload } = require('../../multerConfig');
 
@@ -17,9 +17,10 @@ const { upload } = require('../../multerConfig');
 
 module.exports = (apiRouter) => {
     // get routes
-    apiRouter.route('/users/getusers/').get(authMiddleware, usersCtrl.getMany);
+    apiRouter.route('/users/getusers').get(authMiddleware, usersCtrl.getMany);
     apiRouter.route('/users/getuser/:id').get(authMiddleware, usersCtrl.getUser);
     apiRouter.route('/users/me').get(authMiddleware, usersCtrl.getMe);
+    apiRouter.route('/users/podium-country-filter/:pays').get(authMiddleware, usersCtrl.getUsersByCountryOrderedByPodium)
 
     apiRouter.route('/users/getusersByAgesInterval').get(authMiddleware, usersCtrl.getusersByAgesInterval);
     apiRouter.route('/users/getUsersInSameCountry/:id').get(authMiddleware, usersCtrl.getUsersInSameCountry);
@@ -73,4 +74,5 @@ module.exports = (apiRouter) => {
     apiRouter.route('/annonce/new-reservation').post(authMiddleware, carteCtrl.makeReservation);
     apiRouter.route('/delete-account').post(authMiddleware, usersCtrl.requestAccountDelete);
     apiRouter.route('/user/user-dm-companies/addNew').post(ValidatorMiddlewares(addUserCompanySchema), usersCtrl.addUserCompany);
+    apiRouter.route('/users/location-filter').post(ValidatorMiddlewares(fetchUsersbyDistanceSchema), authMiddleware, usersCtrl.fetchNearbyUsers)
 };

@@ -11,14 +11,10 @@ var server = express();
 const { upload } = require('./multerConfig');
 
 // Import the setupSocketIO function
-const setupSocketIO = require('./socketConfig');
 
 //Configuration
 server.use(bodyParser.urlencoded({ extended: true }));
 server.use(bodyParser.json());
-
-server.use('api/v1/uploads', express.static('uploads'));
-server.use('/api/v1/uploads', upload.single('image'));
 
 server.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -33,9 +29,6 @@ server.get('/', function (req, res) {
     res.status(200).send('<h1>Coucou! T\'es sur mon super server</h1>');
     // res.sendFile(__dirname + '/socket_test_client.html');
 });
-
-
-const httpServer = setupSocketIO(server);
 
 
 server.use('/api/v1', apiRouterV1);
