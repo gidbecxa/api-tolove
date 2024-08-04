@@ -14,6 +14,46 @@ const prisma = new PrismaClient();
 
 module.exports = {
 
+    registerWithTwilio: async function (req, res) {
+        const { pays, phoneNumber } = req.body;
+        console.log("Attempting to verify user:", phoneNumber);
+        let verificationRequest;
+
+        try {
+            const response = await prisma.user.findMany({
+                skip: 0,
+                take: 1,
+                where: {
+                    phoneNumber: {
+                        equals: phoneNumber,
+                    },
+                },
+            })
+
+            if (response.length > 0) {
+                return res.status(422).send({ success: false, msg: 'This phone number is already in use' });
+            } else {
+                console.log('User phone number is not yet in use!');
+
+                verificationRequest = await twilio.verify.v2.services(VERIFICATION_SID)
+                    .verifications
+                    .create({ to: phoneNumber, channel: 'sms' })
+                // .then(verification => console.log('Verification data:', verification));
+
+                res.status(201).send({
+                    success: true,
+                    msg: 'Verification code sent successfully',
+                })
+            }
+        } catch (error) {
+            logger.error(error);
+            return res.status(500).send(error);
+            // return res.status(500).json({error: 'Failed to send verification code'});
+        }
+
+        logger.debug(verificationRequest);
+    },
+
     register: async function (req, res) {
         const { pays, phoneNumber } = req.body;
         console.log('Request recieved for sending OTP: phone number, ', phoneNumber);
@@ -37,6 +77,37 @@ module.exports = {
                     code: '001089',
                     msg: 'Verification code sent successfully',
                 })
+            }
+        } catch (error) {
+            logger.error(error);
+            return res.status(500).send(error);
+        }
+
+    },
+
+    sendSigninCode: async function (req, res) {
+        const { pays, phoneNumber } = req.body;
+        // let verificationRequest;
+
+        try {
+            const response = await prisma.user.findMany({
+                skip: 0,
+                take: 1,
+                where: {
+                    phoneNumber: {
+                        equals: phoneNumber,
+                    },
+                },
+            })
+
+            if (response.length > 0) {
+                res.status(201).send({
+                    success: true,
+                    code: '001089',
+                    msg: 'Verification code sent successfully',
+                })
+            } else {
+                return res.status(422).send({ success: false, msg: 'This phone number does not exist' });
             }
         } catch (error) {
             logger.error(error);
@@ -157,6 +228,68 @@ module.exports = {
             console.error('Error creating user:', error);
             res.status(500).json({ success: false, error: "Failed to create user" });
         }
+    },
+
+    verifyViaTwilio: async function (req, res) {
+        // const { verificationCode: code } = req.body;
+        const { code, phoneNumber, pays } = req.body;
+        console.log(code, pays, phoneNumber);
+
+        let verificationResult;
+        const errors = { wasValidated: true };
+
+        try {
+            verificationResult = await twilio.verify.v2.services(VERIFICATION_SID)
+                .verificationChecks
+                .create({ to: phoneNumber, code: code })
+            // .then(verification_check => console.log('Verification result data', verification_check));
+
+            if (verificationResult && verificationResult.status === 'approved') {
+                console.log('Verification approved. Attempting to create user...');
+
+                try {
+                    const user = await prisma.user.create({
+                        data: {
+                            phoneNumber: phoneNumber,
+                            pays: pays,
+                        },
+                    });
+
+                    const userId = user.id;
+                    const accessToken = jwtUtils.generateTokenForUser(user);
+                    const refreshToken = jwtUtils.generateRefreshTokenForUser(user);
+
+                    res.status(201).send({
+                        success: true,
+                        msg: 'User was created successfully',
+                        data: {
+                            'userId': userId,
+                            'access_token': accessToken,
+                            'refresh_token': refreshToken,
+                        },
+                    });
+                } catch (error) {
+                    res.status(500).send({
+                        success: false,
+                        msg: error.message || 'Some error occurred while creating the user',
+                    });
+                }
+            } else {
+                console.log('Verification not approved.');
+                res.status(422).send({
+                    success: false,
+                    msg: 'Verification failed. Please check the verification code.',
+                });
+            }
+        } catch (error) {
+            logger.error(error);
+            return res.status(500).send(error);
+        }
+
+        logger.debug(verificationResult);
+
+
+        // errors.verificationCode = `Unable to verify code. status: ${verificationResult.status}`;
     },
 
     verifyCompany: async function (req, res) {
@@ -285,6 +418,74 @@ module.exports = {
         }
     },
 
+    login: async function (req, res) {
+
+        const { usernameOrEmail, password } = req.body
+
+        await prisma.user.findMany({
+            skip: 0,
+            take: 1,
+            where: {
+                OR: [
+                    {
+                        username: {
+                            equals: usernameOrEmail,
+                        },
+                    },
+                    {
+                        email: {
+                            equals: usernameOrEmail,
+                        },
+                    },
+                ],
+            },
+            select: {
+                id: true,
+                email: true,
+                username: true,
+                password: true,
+                role: true
+            }
+        })
+            .then((userFound) => {
+
+                if (userFound.length > 0) {
+
+                    // console.log(userFound[0]);
+
+                    bcrypt.compare(password, userFound[0].password, (errBycrypt, resBycrypt) => {
+
+                        if (resBycrypt) {
+                            //refresh token...
+                            res.status(201).json({
+                                success: true,
+                                data: {
+                                    'userId': userFound[0].id,
+                                    'access_token': jwtUtils.generateTokenForUser(userFound[0]),
+                                    'refresh_token': jwtUtils.generateRefreshTokenForUser(userFound[0])
+                                }
+                            });
+
+                        } else {
+                            //message d'erreur mdp ou mail...
+                            res.status(403).json({ success: false, msg: 'username, email ou password invalide' });
+                        }
+
+                    });
+
+                }
+                else {
+                    res.status(404).json({ success: false, msg: 'cet utilisateur n\'existe pas' });
+                }
+
+            })
+            .catch((err) => {
+                console.log(err);
+                res.status(500).json({ success: false, msg: 'unable to verify user' });
+            });
+
+    },
+
     loginAdmin: async function (req, res) {
 
         const { usernameOrEmail, phoneNumber } = req.body
@@ -353,6 +554,59 @@ module.exports = {
             });
 
     },
+
+    loginDemo: async function (req, res) {
+        const { phoneNumber, code } = req.body;
+        console.log(phoneNumber, code);
+
+        // Check if the OTP is correct
+        if (code !== '001089') {
+            return res.status(403).json({ success: false, msg: 'Invalid OTP' });
+        }
+
+        try {
+            const userFound = await prisma.user.findMany({
+                skip: 0,
+                take: 1,
+                where: {
+                    phoneNumber: {
+                        equals: phoneNumber,
+                    },
+                },
+                select: {
+                    id: true,
+                    phoneNumber: true,
+                    role: true
+                }
+            });
+
+            if (userFound.length > 0) {
+                console.log(userFound[0]);
+
+                if (userFound[0].phoneNumber === phoneNumber) {
+                    // Generate tokens
+                    const accessToken = jwtUtils.generateTokenForUser(userFound[0]);
+                    const refreshToken = jwtUtils.generateRefreshTokenForUser(userFound[0]);
+
+                    res.status(201).json({
+                        success: true,
+                        data: {
+                            userId: userFound[0].id,
+                            access_token: accessToken,
+                            refresh_token: refreshToken
+                        }
+                    });
+                } else {
+                    res.status(403).json({ success: false, msg: 'Phone number invalid or unauthorized role' });
+                }
+            } else {
+                res.status(404).json({ success: false, msg: 'User not found' });
+            }
+        } catch (err) {
+            console.log(err);
+            res.status(500).json({ success: false, msg: 'Unable to verify user' });
+        }
+    }
 
 
 }
